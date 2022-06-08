@@ -19,7 +19,46 @@
             fill: green;
             stroke: brown;
         }
+        .wrapper {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            grid-template-rows: 500px 300px;
+            grid-column-gap: 10px;
+            grid-row-gap: 1em;
+        }
+        .hist-box {
+            grid-column-start: 1;
+            grid-column-end: 2;
+            grid-row-start: 1;
+            grid-row-end: 2;
+            background-color: lightblue;
+        }
+        .bubble-box {
+            grid-column-start: 2;
+            grid-column-end: 3;
+            grid-row-start: 1;
+            grid-row-end: 3;
+            background-color: lightblue;
+        }
+        .controller-box {
+            grid-column-start: 1;
+            grid-column-end: 2;
+            grid-row-start: 2;
+            grid-row-end: 3;
+            background-color: lightblue;
+        }
     </style>
+    <div class="wrapper">
+        <div class="hist-box">
+            1
+        </div>
+        <div class="bubble-box">
+            2
+        </div>
+        <div class="controller-box">
+            3
+        </div>
+    </div>
     <div id="chart-area">
     </div>
 
