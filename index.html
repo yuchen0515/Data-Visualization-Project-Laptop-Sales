@@ -21,6 +21,9 @@
         }
         .wrapper {
             display: grid;
+            border: 3px solid darkcyan;
+            border-radius: 5px;
+            background-color: #fff;
             grid-template-columns: 1fr 2fr;
             grid-template-rows: 500px 300px;
             grid-column-gap: 10px;
@@ -31,6 +34,8 @@
             grid-column-end: 2;
             grid-row-start: 1;
             grid-row-end: 2;
+            border: 2px solid lightseagreen;
+            border-radius: 5px;
             background-color: lightblue;
         }
         .bubble-box {
@@ -38,6 +43,8 @@
             grid-column-end: 3;
             grid-row-start: 1;
             grid-row-end: 3;
+            border: 2px solid lightseagreen;
+            border-radius: 5px;
             background-color: lightblue;
         }
         .controller-box {
@@ -45,21 +52,24 @@
             grid-column-end: 2;
             grid-row-start: 2;
             grid-row-end: 3;
+            border: 2px solid lightseagreen;
+            border-radius: 5px;
             background-color: lightblue;
         }
     </style>
     <div class="wrapper">
         <div class="hist-box">
-            1
+            Histogram Chart
+            <div id="hist-chart"></div>
         </div>
         <div class="bubble-box">
-            2
+            Bubble Chart
+            <div id="bubble-chart"></div>
         </div>
         <div class="controller-box">
-            3
+            Controller
+            <div id="controller-chart"></div>
         </div>
-    </div>
-    <div id="chart-area">
     </div>
 
     <script src="https://d3js.org/d3.v5.min.js"></script>
