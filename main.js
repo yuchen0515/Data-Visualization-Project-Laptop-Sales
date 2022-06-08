@@ -30,13 +30,13 @@ var dataset = d3.csv("Cleaned_Laptop_data.csv", function(d) {
 // document.write("Please look up the console output~")
 // console.log(dataset);
 
-const MARGIN = {left:100, right:10, top:10, bottom:100},
-    WIDTH = 1000 - MARGIN.left - MARGIN.right,
-    HEIGHT = 1000 - MARGIN.top - MARGIN.bottom,
+const MARGIN = {left:100, right:100, top:100, bottom:100},
+    WIDTH = 632 - MARGIN.left - MARGIN.right,
+    HEIGHT = 816 - MARGIN.top - MARGIN.bottom,
     padding = 1.5, // seperation between same-color circles
     clusterpadding = 6. // seperation between different-color circles
 
-const svg = d3.select("#chart-area").append("svg")
+const svg = d3.select(".bubble-box").append("svg")
             .attr("width", WIDTH + MARGIN.left + MARGIN.right)
             .attr("height", HEIGHT + MARGIN.top + MARGIN.bottom)
 
@@ -83,7 +83,7 @@ dataset.then(datas=>{
     // radius scale
     var rScale = d3.scaleLinear()
                    .domain([0, d3.max(d3.entries(dataset_by_brands), d => d.value)])
-                   .range([50, 100])
+                   .range([50, 70])
 
     var nodes = Array();
     for (let [key, value] of Object.entries(dataset_by_brands))
