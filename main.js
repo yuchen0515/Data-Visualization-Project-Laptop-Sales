@@ -88,8 +88,7 @@ dataset.then(datas=>{
     var nodes = Array();
     for (let [key, value] of Object.entries(dataset_by_brands))
     {
-        console.log(rScale(value))
-        let obj = {cluster: key, radius: rScale(value)}
+        let obj = {cluster: key, radius: (value)}
         nodes.push(obj)
     };
 
@@ -99,10 +98,16 @@ dataset.then(datas=>{
     //     FORCE SIMULATION       //
     // ---------------------------//
 
+    // y force scale
+    var yfScale = d3.scaleThreshold()
+                    .domain([0,10 ,50 ,100 ,200])
+                    .range([900, 700, 400, 100])
+
     var simulation = d3.forceSimulation(nodes)
-                  .force('charge', d3.forceManyBody().strength(5))
-                  .force('center', d3.forceCenter(WIDTH / 2, HEIGHT / 2))
-                  .force('collision', d3.forceCollide().radius(d=>d.radius))
+                  .force('charge', d3.forceManyBody().strength(70))
+                  .force('center', d3.forceCenter(WIDTH/2, HEIGHT/2)   )
+                  .force('yForce', d3.forceY(d=>yfScale(d.radius)).strength(0.01))
+                  .force('collision', d3.forceCollide().radius(d=>rScale(d.radius)))
                   .on('tick', ticked);   
 
 
@@ -116,7 +121,7 @@ dataset.then(datas=>{
                     .append("circle")
                     .attr('cx', d => d.x)
                     .attr('cy', d => d.y)
-                    .attr('r', d => d.radius)
+                    .attr('r', d => rScale(d.radius))
                     .attr('fill', 'blue')
 
     const labels = bubbleChart.selectAll('.label')
@@ -125,10 +130,10 @@ dataset.then(datas=>{
                .append('text')
                .attr('x', d => d.x)
                .attr('y', d => d.y)
-               .attr('dy', ".5em")
+               .attr('dy', "0.4em")
                .attr('text-anchor', 'middle')
                .attr('fill', 'white')
-               .style('font-size',d => String(d.r/2)+"px")
+               .style('font-size',d => rScale(d.radius)-35+"px")
                .text(d => d.cluster)
 
     function ticked()
