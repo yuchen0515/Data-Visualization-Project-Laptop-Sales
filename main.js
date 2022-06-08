@@ -95,6 +95,13 @@ dataset.then(datas=>{
         nodes.push(obj)
     };
 
+    // color scale
+    var brands = nodes.map(function(d) { return d.cluster });
+    brands = d3.set(brands).values();
+
+    var brandColor = d3.scaleOrdinal()
+        .domain(brands)
+        .range(d3.schemeAccent);
     
     // ---------------------------//
     //     FORCE SIMULATION       //
@@ -121,7 +128,10 @@ dataset.then(datas=>{
                     .attr('cx', d => d.x)
                     .attr('cy', d => d.y)
                     .attr('r', d => rScale(d.radius))
-                    .attr('fill', 'blue')
+                    .attr("fill", function (d) {
+                        return brandColor(d.cluster);
+                    } )
+                    .style("opacity", "0.6")
 
     const labels = bubbleChart.selectAll('.label')
                .data(nodes)
