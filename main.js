@@ -1,4 +1,3 @@
-// STEP 1: data processing
 var dataset = d3.csv("Cleaned_Laptop_data.csv", function(d) {
     return {
         brand:              d.brand,
@@ -27,25 +26,29 @@ var dataset = d3.csv("Cleaned_Laptop_data.csv", function(d) {
     };
 });
 
-// document.write("Please look up the console output~")
-// console.log(dataset);
+const MARGIN = {
+    left: 100,
+    right: 100,
+    top: 100,
+    bottom: 100
+};
 
-const MARGIN = {left:100, right:100, top:100, bottom:100},
-    WIDTH = 632 - MARGIN.left - MARGIN.right,
+const WIDTH = 632 - MARGIN.left - MARGIN.right,
     HEIGHT = 816 - MARGIN.top - MARGIN.bottom,
-    padding = 1.5, // seperation between same-color circles
+    padding = 1.5,      // seperation between same-color circles
     clusterpadding = 6. // seperation between different-color circles
 
 const svg = d3.select(".bubble-box").append("svg")
             .attr("width", WIDTH + MARGIN.left + MARGIN.right)
             .attr("height", HEIGHT + MARGIN.top + MARGIN.bottom)
 
+
 // ---------------------------//
 //        BUBBLE CHART        //
 // ---------------------------//
-
 const bubbleChart = svg.append("g")
-                       .attr("transform", `translate(${MARGIN.left},${MARGIN.right})`)
+    .attr("transform", `translate(${MARGIN.left},${MARGIN.right})`)
+
 
 // ---------------------------//
 //       AXIS AND SCALE       //
@@ -59,10 +62,10 @@ const bubbleChart = svg.append("g")
 // var yScale = d3.scaleLinear()
 //                .domain(d3.extent())
 
+
 // ---------------------------//
 //         BUBBLE NODES       //
 // ---------------------------//
-
 let pack = d3.pack()
              .size([WIDTH,HEIGHT])
 
@@ -92,13 +95,10 @@ dataset.then(datas=>{
         nodes.push(obj)
     };
 
-    console.log(nodes)
     
     // ---------------------------//
     //     FORCE SIMULATION       //
     // ---------------------------//
-
-    // y force scale
     var yfScale = d3.scaleThreshold()
                     .domain([0,10 ,50 ,100 ,200])
                     .range([900, 700, 400, 100])
@@ -114,7 +114,6 @@ dataset.then(datas=>{
     // ---------------------------//
     //           BUBBLES          //
     // ---------------------------//
-
     const circles = bubbleChart.selectAll('.node')
                     .data(nodes)
                     .enter()
@@ -138,19 +137,12 @@ dataset.then(datas=>{
 
     function ticked()
     {
-        // console.log(nodes)
         circles
-                    // .data(nodes)
-                    // .join('circle')
-                    .attr('cx', d => d.x)
-                    .attr('cy', d => d.y)
-                    // .attr('r', d => d.r)
-                    // .attr('fill', 'blue')
+            .attr('cx', d => d.x)
+            .attr('cy', d => d.y)
 
         labels
           .attr('x', d=>d.x)
           .attr('y', d=>d.y)
-    
     }
-
-})
+});
