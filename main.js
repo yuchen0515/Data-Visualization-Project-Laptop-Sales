@@ -110,6 +110,11 @@ dataset.then(datas=>{
                     .domain([0,10 ,50 ,100 ,200])
                     .range([900, 700, 400, 100])
 
+    // y force scale
+    var yfScale = d3.scaleThreshold()
+                    .domain([0,10 ,50 ,100 ,200])
+                    .range([900, 700, 400, 100])
+
     var simulation = d3.forceSimulation(nodes)
                   .force('charge', d3.forceManyBody().strength(70))
                   .force('center', d3.forceCenter(WIDTH/2, HEIGHT/2)   )
