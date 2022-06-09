@@ -47,6 +47,23 @@
             border-radius: 5px;
             background-color: lightblue;
         }
+        .bubble-box-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            grid-template-rows: 1fr;
+        }
+        .bubble-box-slider {
+            grid-column-start: 2;
+            grid-column-end: 3;
+            grid-row-start: 1;
+            grid-row-end: 2;
+        }
+        .bubble-box-chart {
+            grid-column-start: 1;
+            grid-column-end: 3;
+            grid-row-start: 1;
+            grid-row-end: 2;
+        }
         .controller-box {
             grid-column-start: 1;
             grid-column-end: 2;
@@ -66,7 +83,7 @@
             height: 14px;
             border-radius: 10px;
             text-align: left;
-            margin: 45px 0 10px 0;
+            margin: 30px 10px 45px 0;
         }
 
         [slider] > div {
@@ -198,12 +215,12 @@
         [slider] > div > [sign] {
             opacity: 0;
             position: absolute;
-            margin-left: -11px;
-            top: -39px;
+            margin-left: -26px;
+            top: 30px;
             z-index:3;
             background-color: lightseagreen;
             color: #fff;
-            width: 28px;
+            width: 58px;
             height: 28px;
             border-radius: 28px;
             -webkit-border-radius: 28px;
@@ -217,13 +234,13 @@
             position: absolute;
             content: '';
             left: 0;
-            border-radius: 16px;
-            top: 19px;
-            border-left: 14px solid transparent;
-            border-right: 14px solid transparent;
-            border-top-width: 16px;
-            border-top-style: solid;
-            border-top-color: lightseagreen;
+            border-radius: 18px;
+            top: -8px;
+            border-left: 29px solid transparent;
+            border-right: 29px solid transparent;
+            border-bottom-width: 18px;
+            border-bottom-style: solid;
+            border-bottom-color: lightseagreen;
         }
 
         [slider] > div > [sign] > span {
@@ -242,25 +259,28 @@
             <div id="hist-chart"></div>
         </div>
         <div class="bubble-box">
-            Bubble Chart
-            <div id="bubble-chart"></div>
-            <div slider id="slider-distance">
-                <div>
-                  <div inverse-left style="width:70%;"></div>
-                  <div inverse-right style="width:70%;"></div>
-                  <div range style="left:30%;right:40%;"></div>
-                  <span thumb style="left:30%;"></span>
-                  <span thumb style="left:60%;"></span>
-                  <div sign style="left:30%;">
-                    <span id="value">0</span>
-                  </div>
-                  <div sign style="left:60%;">
-                    <span id="value">100</span>
-                  </div>
+            <div class="bubble-box-wrapper">
+                <div class="bubble-box-slider">
+                    Price interval
                 </div>
-                <input id="pSlider1" type="range" tabindex="0" value="0" max="100" min="0" step="1" />
-              
-                <input id="pSlider2" type="range" tabindex="0" value="110" max="100" min="0" step="1" />
+                <div slider id="slider-distance" class="bubble-box-slider">
+                    <div>
+                        <div inverse-left style="width:70%;"></div>
+                        <div inverse-right style="width:70%;"></div>
+                        <div range style="left:30%;right:40%;"></div>
+                        <span thumb style="left:30%;"></span>
+                        <span thumb style="left:60%;"></span>
+                        <div sign style="left:30%;">
+                            <span id="value">0</span>
+                        </div>
+                        <div sign style="left:60%;">
+                            <span id="value">100</span>
+                        </div>
+                    </div>
+                    <input id="pSlider1" type="range" tabindex="0" value="0" max="100" min="0" step="1" />
+                    <input id="pSlider2" type="range" tabindex="0" value="110" max="100" min="0" step="1" />
+                </div>
+                <div id="bubble-chart" class="bubble-box-chart" background-color="transparent"></div>
             </div>
         </div>
         <div class="controller-box">

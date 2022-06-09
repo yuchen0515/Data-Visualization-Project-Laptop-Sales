@@ -38,7 +38,7 @@ const WIDTH = 632 - MARGIN.left - MARGIN.right,
     padding = 1.5,      // seperation between same-color circles
     clusterpadding = 6. // seperation between different-color circles
 
-const svg = d3.select(".bubble-box").append("svg")
+const svg = d3.select("#bubble-chart").append("svg")
             .attr("width", WIDTH + MARGIN.left + MARGIN.right)
             .attr("height", HEIGHT + MARGIN.top + MARGIN.bottom)
 
