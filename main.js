@@ -103,6 +103,15 @@ var dataByPrice = function(datas, min_price, max_price)
     return dataset_by_Price;
 }
 
+var brandColor = d3.scaleOrdinal()
+    .domain(dataset.then(function(data) {
+        var brands = data.map(function(d) {return d.brand});
+        brands = [...new Set(brands)];
+        return brands;
+    }))
+    .range(d3.schemeAccent);
+
+
 // ---------------------------//
 //      DRAW BUBBLE CHART     //
 // ---------------------------//
@@ -120,13 +129,6 @@ var drawBubbleChart = function(datas)
         nodes.push(obj)
     };
 
-    // color scale
-    var brands = nodes.map(function(d) { return d.cluster });
-    brands = d3.set(brands).values();
-
-    var brandColor = d3.scaleOrdinal()
-        .domain(brands)
-        .range(d3.schemeAccent);
     
     // ---------------------------//
     //     FORCE SIMULATION       //
