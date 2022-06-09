@@ -223,4 +223,30 @@ dataset.then(datas=>{
         children[9].style.left=value+'%';children[13].style.left=value+'%';
         children[13].childNodes[1].innerHTML=this.value;
     }
+
+    var debounce = function(func, wait, immediate) {
+        var timeout, result;
+        return function() {
+          var context = this, args = arguments;
+          var later = function() {
+            timeout = null;
+            if (!immediate) result = func.apply(context, args);
+          };
+          var callNow = immediate && !timeout;
+          clearTimeout(timeout);
+          timeout = setTimeout(later, wait);
+          if (callNow) result = func.apply(context, args);
+          return result;
+        };
+      };
+
+    // on update minimun value
+    priceSlider1.onchange = debounce(()=>{
+        console.log(priceSlider1.value);
+    })
+
+    // on update maximun value
+    priceSlider2.onchange = debounce(()=>{
+        console.log(priceSlider2.value);
+    })
 });
