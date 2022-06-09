@@ -112,6 +112,7 @@ var brandColor = d3.scaleOrdinal()
     .range(d3.schemeAccent);
 
 
+
 // ---------------------------//
 //      DRAW BUBBLE CHART     //
 // ---------------------------//
@@ -275,17 +276,81 @@ var debounce = function(func, wait, immediate) {
     };
 };
 
-// on update minimun value
-priceSlider1.onchange = debounce(()=>{
-    dataset.then(datas=>{
-        drawBubbleChart(dataByBrand(dataByPrice(datas, priceSlider1.value, priceSlider2.value)));
-    });
-})
 
-// on update maximun value
-priceSlider2.onchange = debounce(()=>{
-    dataset.then(datas=>{
-        drawBubbleChart(dataByBrand(dataByPrice(datas, priceSlider1.value, priceSlider2.value)));
-    });
-})
+var drawCheckbox = function(brands) {
+    var el = document.getElementById("controller-chart");
 
+    brands.forEach(function(d, i) {
+        var elCheckbox = document.createElement('brand-checkbox');
+
+        var str = '<input type="checkbox" style="white-space:pre" class="brand-checkbox" value="' + d + '" name="brand_' + d + '" checked>';
+
+        var textBackgroundColor = '<span style="background-color:';
+        textBackgroundColor += brandColor(d);
+        textBackgroundColor += ';">&emsp; &emsp; </span>';
+
+        str += d;
+        str += '&#9;';
+        str += textBackgroundColor;
+        str += '&emsp; &emsp; &#9;';
+
+        if (i != 0 && (i + 1) % 2 == 0) {
+            str += '<br>';
+        }
+        elCheckbox.innerHTML = str
+        el.appendChild(elCheckbox);
+
+    })
+};
+
+
+function filterByBrand(data, brands) {
+    var datas = Array();
+    data.forEach(function(d) {
+        if (brands.indexOf(d.brand) !== -1) {
+            datas.push(d);
+        }
+    });
+
+    return datas;
+};
+
+
+function uniBrands(data) {
+    var brands = data.map(function(d) {return d.brand});
+    brands = [...new Set(brands)];
+    return brands;
+}
+
+
+//update & listener
+dataset.then(function(data) {
+    var brands = uniBrands(data);
+    drawCheckbox(brands);
+    var checkboxes = document.querySelectorAll('.brand-checkbox'); 
+
+    checkboxes.forEach(function(c) {
+        c.addEventListener('click', (event) => {
+            if (c.checked === true) {
+                brands.push(c.value);
+            } else {
+                var ind = brands.indexOf(c.value);
+                brands.splice(ind, 1);
+            }
+            filterData = filterByBrand(data, brands);
+            drawBubbleChart(dataByBrand(dataByPrice(filterData, priceSlider1.value, priceSlider2.value)));
+        }); 
+    })
+
+    // update minimun value
+    priceSlider1.onchange = debounce(()=>{
+        filterData = filterByBrand(data, brands);
+        drawBubbleChart(dataByBrand(dataByPrice(filterData, priceSlider1.value, priceSlider2.value)));
+    })
+
+    // update maximun value
+    priceSlider2.onchange = debounce(()=>{
+        filterData = filterByBrand(data, brands);
+        drawBubbleChart(dataByBrand(dataByPrice(filterData, priceSlider1.value, priceSlider2.value)));
+    })
+});
