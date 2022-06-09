@@ -157,4 +157,70 @@ dataset.then(datas=>{
           .attr('x', d=>d.x)
           .attr('y', d=>d.y)
     }
+
+    // ---------------------------//
+    //       PRICE INTERVAL       //
+    // ---------------------------//
+    var priceSlider1 = document.getElementById("pSlider1");
+    var priceSlider2 = document.getElementById("pSlider2");
+    dataset.then(datas=>{
+        let maxValue = 0;
+        for( const [key, value] of Object.entries(datas))
+        {
+            if (value.latest_price > maxValue)
+            {
+                maxValue = value.latest_price;
+            }
+        }
+        // Set minimun price interval
+        {
+            priceSlider1.max = maxValue;
+            priceSlider1.value=Math.min(priceSlider1.value,priceSlider1.parentNode.childNodes[5].value-1);
+            var ratio = 100/(Number(priceSlider1.max)-Number(priceSlider1.min));
+            var value=(ratio)*Number(priceSlider1.value)-(ratio)*Number(priceSlider1.min);
+            var children = priceSlider1.parentNode.childNodes[1].childNodes;
+            children[1].style.width=value+'%';
+            children[5].style.left=value+'%';
+            children[7].style.left=value+'%';children[11].style.left=value+'%';
+            children[11].childNodes[1].innerHTML=priceSlider1.value; 
+        }
+        // Set maximun price interval
+        {
+            priceSlider2.max = maxValue;
+            priceSlider2.value=maxValue;
+            var ratio = 100/(Number(priceSlider2.max)-Number(priceSlider2.min)); 
+            var value=(ratio)*Number(priceSlider2.value)-(ratio)*Number(priceSlider2.min);
+            var children = priceSlider2.parentNode.childNodes[1].childNodes;
+            children[3].style.width=(100-value)+'%';
+            children[5].style.right=(100-value)+'%';
+            children[9].style.left=value+'%';children[13].style.left=value+'%';
+            children[13].childNodes[1].innerHTML=priceSlider2.value;
+        }
+    })
+
+    // onchange of minimun price interval
+    priceSlider1.oninput = function()
+    {
+        this.value=Math.min(this.value,this.parentNode.childNodes[5].value-1);
+        var ratio = 100/(Number(this.max)-Number(this.min));
+        var value=(ratio)*Number(this.value)-(ratio)*Number(this.min);
+        var children = this.parentNode.childNodes[1].childNodes;
+        children[1].style.width=value+'%';
+        children[5].style.left=value+'%';
+        children[7].style.left=value+'%';children[11].style.left=value+'%';
+        children[11].childNodes[1].innerHTML=this.value; 
+    }
+
+    // onchange of maximun price interval
+    priceSlider2.oninput = function()
+    {
+        this.value=Math.max(this.value,this.parentNode.childNodes[3].value-(-1));
+        var ratio = 100/(Number(this.max)-Number(this.min)); 
+        var value=(ratio)*Number(this.value)-(ratio)*Number(this.min);
+        var children = this.parentNode.childNodes[1].childNodes;
+        children[3].style.width=(100-value)+'%';
+        children[5].style.right=(100-value)+'%';
+        children[9].style.left=value+'%';children[13].style.left=value+'%';
+        children[13].childNodes[1].innerHTML=this.value;
+    }
 });
