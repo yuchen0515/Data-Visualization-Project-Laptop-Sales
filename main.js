@@ -66,9 +66,6 @@ const bubbleChart = svg.append("g")
 // ---------------------------//
 //         BUBBLE NODES       //
 // ---------------------------//
-let pack = d3.pack()
-             .size([WIDTH,HEIGHT])
-
 let dataset_by_brands = Object()
 dataset.then(datas=>{
     for (let [key, value] of Object.entries(datas))
