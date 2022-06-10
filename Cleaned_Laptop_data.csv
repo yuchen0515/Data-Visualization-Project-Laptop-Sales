@@ -476,7 +476,7 @@ ASUS,Vivobook,Intel,Celeron Dual,Missing,4,DDR4,0,0,Windows,64,0,Casual,0,0,No,N
 Lenovo,ThinkPad,Intel,Core i5,10th,16,DDR4,512,512,Windows,64,0,ThinNlight,14,3,Yes,No,155411,0,0,0,0,0
 HP,Spectre,Intel,Core i7,10th,16,LPDDR3,512,0,Windows,64,0,Casual,13.3,1,Yes,Yes,239759,0,0,0,0,0
 Lenovo,ThinkPad,Intel,Core i5,11th,8,DDR4,512,0,Windows,64,0,Casual,15.6,1,No,Yes,64990,77487,16,4.4,125,11
-acer,Nitro,AMD,5,Missing,,,0,0,Missing,32,4,Casual,0,0,No,No,72990,99999,27,4.5,425,67
+acer,Nitro,AMD,Ryzen 5,Missing,,,0,0,Missing,32,4,Casual,0,0,No,No,72990,99999,27,4.5,425,67
 Lenovo,Core,Intel,Core i3,10th,8,DDR4,256,0,Windows,32,0,Casual,14,0,No,No,40990,56800,27,3.7,3,0
 DELL,Inspiron,Intel,Core i3,10th,8,DDR4,256,0,Windows,64,0,ThinNlight,14.96,1,No,No,42490,54723,22,0,0,0
 HP,Pavilion,AMD,Ryzen 5,Missing,8,DDR4,256,1024,Windows,64,4,Gaming,15.6,1,No,No,80000,83085,3,4.6,34,6
@@ -819,7 +819,7 @@ DELL,Core,Intel,Core i5,11th,8,DDR4,512,0,Windows,64,2,Casual,14,1,Yes,No,79590,
 HP,Pavilion,AMD,Ryzen 5,Missing,16,DDR4,512,0,Windows,64,0,ThinNlight,14,1,No,Yes,59999,74839,19,4.1,19,1
 HP,15q,AMD,Ryzen 3,Missing,4,DDR4,0,1024,Windows,64,0,Casual,15.6,1,No,No,32917,0,0,4,353,58
 Avita,Liber,Intel,Core i5,7th,8,DDR4,512,0,Windows,64,0,ThinNlight,13.3,0,No,No,65556,79990,18,0,0,0
-HP,15s,M.2,Slot for,Missing,Intel,i5,0,0,Missing,32,0,ThinNlight,0,0,No,No,55990,63179,11,4,818,109
+HP,15s,Intel,Core i5,11th,8,DDR4,512,0,Missing,32,0,ThinNlight,0,0,No,No,55990,63179,11,4,818,109
 ASUS,TUF,Intel,Core i5,11th,8,DDR4,512,0,Windows,64,4,Casual,15.6,1,No,No,76990,105990,27,0,0,0
 ASUS,Vivobook,Intel,Core i3,11th,8,DDR4,256,0,Windows,64,0,Casual,15.6,0,No,No,48990,58990,16,0,0,0
 HP,HP,Intel,Core i7,11th,16,DDR4,1024,0,Windows,64,2,Casual,13.3,1,No,Yes,94990,160134,40,0,0,0
@@ -830,7 +830,7 @@ DELL,Inspiron,Intel,Core i3,11th,8,DDR4,512,0,Windows,64,0,ThinNlight,15.6,0,No,
 Lenovo,Ideapad,AMD,Ryzen 7,Missing,16,DDR4,512,0,Windows,64,0,Casual,14,1,No,No,73400,108590,32,0,0,0
 HP,Pavilion,Intel,Core i3,11th,8,DDR4,512,0,Windows,64,0,Casual,14,1,Yes,Yes,55490,65853,15,4.3,143,15
 Avita,Liber,Intel,Core i5,7th,8,DDR4,512,0,Windows,64,0,ThinNlight,13.3,0,No,No,65556,79990,18,0,0,0
-acer,Swift,Intel,i7,Missing,,,0,0,Missing,32,0,Casual,0,0,No,No,94190,124999,24,4.3,31,6
+acer,Swift,Intel,Core i7,Missing,,,0,0,Missing,32,0,Casual,0,0,No,No,94190,124999,24,4.3,31,6
 Vaio,E,AMD,Ryzen 7,Missing,8,DDR4,512,0,Windows,64,0,ThinNlight,15.6,2,No,Yes,57990,76090,23,3.8,139,26
 Lenovo,Legion,Intel,Core i7,10th,16,DDR4,1024,0,Windows,64,8,Casual,15.6,1,No,Yes,234990,349890,32,0,0,0
 HP,x360,Intel,Core i3,11th,8,DDR4,256,0,Missing,64,0,Casual,14,1,Yes,No,56490,64923,12,0,0,0
