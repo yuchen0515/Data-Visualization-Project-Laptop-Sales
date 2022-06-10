@@ -254,6 +254,54 @@
         [slider]:hover > div > [sign] {
             opacity: 1;
         }
+        /* -----------------------------------------//
+        //                TABS CSS                  //
+        // reference:                               //
+        // codepen.io/alvarotrigo/pen/bGoPzQw       //
+        // -----------------------------------------*/
+        .tab .tabs_wrap{
+            padding: 20px;
+            border-bottom: 1px solid #ebedec;
+        }
+
+        .tab .tabs_wrap ul{
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-pack: center;
+                -ms-flex-pack: center;
+                    justify-content: center;
+        }
+
+        .tab .tabs_wrap ul li{
+            width: 135px;
+            text-align: center;
+            background: #e9ecf1;
+            border-right: 1px solid #c1c4c9;
+            padding: 13px 15px;
+            cursor: pointer;
+            -webkit-transition: all 0.2s ease;
+            -o-transition: all 0.2s ease;
+            transition: all 0.2s ease;
+        }
+
+        .tab .tabs_wrap ul li:first-child{
+            border-top-left-radius: 25px;
+            border-bottom-left-radius: 25px;
+        }
+
+        .tab .tabs_wrap ul li:last-child{
+            border-right: 0px;
+            border-top-right-radius: 25px;
+            border-bottom-right-radius: 25px;
+        }
+
+        .tab .tabs_wrap ul li:hover,
+        .tab .tabs_wrap ul li.active{
+            background: #7fc469;
+            color: #fff;
+        }
+
     </style>
     <div class="wrapper">
         <div class="hist-box">
@@ -282,6 +330,17 @@
                     <input id="pSlider1" type="range" tabindex="0" value="0" max="100" min="0" step="1" />
                     <input id="pSlider2" type="range" tabindex="0" value="110" max="100" min="0" step="1" />
                 </div>
+                
+                <div class="tab">
+                    <div class="tabs_wrap">
+                        <ul>
+                        <li data-tabs="brand" class=""active>Brand</li>
+                        <li data-tabs="cpu">CPU</li>
+                        <li data-tabs="numeric">Numeric</li>
+                        </ul>
+                    </div>
+                </div>
+
                 <div id="bubble-chart" class="bubble-box-chart" background-color="transparent"></div>
             </div>
         </div>
