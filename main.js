@@ -98,7 +98,42 @@ var dataByBrand = function(datas)
     return dataset_by_brands;
 }
 
-var dataByPrice = function(datas, min_price, max_price)
+var dataByCPU = function(datas)
+{
+    let dataset_by_cpu = Object()
+    for (let [key, value] of Object.entries(datas))
+    {
+        if (!(value.processor_brand in dataset_by_cpu))
+        {
+            dataset_by_cpu[value.processor_brand] = 1
+        }
+        else
+        {
+            dataset_by_cpu[value.processor_brand]+=1
+        }
+    };
+    return dataset_by_cpu;
+}
+
+var dataByPrice = function(datas)
+{
+    let dataset_by_price = Object()
+    for (let [key, value] of Object.entries(datas))
+    {
+        let rounded_price = Math.round(value.latest_price / 1000) * 1000
+        if (!(rounded_price in dataset_by_price))
+        {
+            dataset_by_price[rounded_price] = 1
+        }
+        else
+        {
+            dataset_by_price[rounded_price]+=1
+        }
+    };
+    return dataset_by_price;
+}
+
+var dataByPriceInterval = function(datas, min_price, max_price)
 {
     let dataset_by_Price = [];
     for (let value of datas)
@@ -221,9 +256,80 @@ var drawBubbleChart = function(datas)
     // ---------------------------//
     //     FORCE SIMULATION       //
     // ---------------------------//
+
+    // y force scale
     var yfScale = d3.scaleThreshold()
                     .domain([0,10 ,50 ,100 ,200])
                     .range([900, 700, 400, 100])
+
+    var simulation = d3.forceSimulation(nodes)
+                  .force('charge', d3.forceManyBody().strength(70))
+                  .force('center', d3.forceCenter(WIDTH/2, HEIGHT/2)   )
+                  .force('yForce', d3.forceY(d=>yfScale(d.radius)).strength(0.01))
+                  .force('collision', d3.forceCollide().radius(d=>rScale(d.radius)))
+                  .on('tick', ticked);   
+
+
+    // ---------------------------//
+    //           BUBBLES          //
+    // ---------------------------//
+    bubbleChart.selectAll("circle").remove();
+    bubbleChart.selectAll("text").remove();
+
+    const circles = bubbleChart.selectAll('.node')
+                    .data(nodes)
+                    .enter()
+                    .append("circle")
+                    .attr('cx', d => d.x)
+                    .attr('cy', d => d.y)
+                    .attr('r', d => rScale(d.radius))
+                    .attr("fill", function (d) {
+                        return brandColor(d.cluster);
+                    } )
+                    .style("opacity", "0.6")
+
+    const labels = bubbleChart.selectAll('.label')
+               .data(nodes)
+               .enter()
+               .append('text')
+               .attr('x', d => d.x)
+               .attr('y', d => d.y)
+               .attr('dy', "0.4em")
+               .attr('text-anchor', 'middle')
+               .attr('fill', 'white')
+               .style('font-size',d => rScale(d.radius)-35+"px")
+               .text(d => d.cluster)
+
+    function ticked()
+    {
+        circles
+            .attr('cx', d => d.x)
+            .attr('cy', d => d.y)
+
+        labels
+          .attr('x', d=>d.x)
+          .attr('y', d=>d.y)
+    }
+}
+
+var drawNumericBubbleChart = function(datas)
+{
+    // radius scale
+    var rScale = d3.scaleLinear()
+                   .domain([0, d3.max(d3.entries(datas), d => d.value)])
+                   .range([50, 70])
+
+    var nodes = Array();
+    for (let [key, value] of Object.entries(datas))
+    {
+        let obj = {cluster: key, radius: (value)}
+        nodes.push(obj)
+    };
+
+    
+    // ---------------------------//
+    //     FORCE SIMULATION       //
+    // ---------------------------//
 
     // y force scale
     var yfScale = d3.scaleThreshold()
@@ -297,6 +403,22 @@ var drawBubbleChart = function(datas)
         labels
           .attr('x', d=>d.x)
           .attr('y', d=>d.y)
+    }
+}
+
+var drawChart = function(selected_tab, filterData)
+{
+    if (selected_tab == "brand")
+    {
+        drawBubbleChart(dataByBrand(dataByPriceInterval(filterData, priceSlider1.value, priceSlider2.value)));
+    }
+    else if (selected_tab == "cpu")
+    {
+        drawBubbleChart(dataByCPU(dataByPriceInterval(filterData, priceSlider1.value, priceSlider2.value)));
+    }
+    else if (selected_tab == "numeric")
+    {
+        drawNumericBubbleChart(dataByPrice(dataByPriceInterval(filterData, priceSlider1.value, priceSlider2.value)));
     }
 }
 
@@ -432,6 +554,8 @@ function uniBrands(data) {
 
 //update & listener
 dataset.then(function(data) {
+    var selected_tab = "brand";
+
     var brands = uniBrands(data);
     drawCheckbox(brands);
     var checkboxes = document.querySelectorAll('.brand-checkbox'); 
@@ -445,19 +569,37 @@ dataset.then(function(data) {
                 brands.splice(ind, 1);
             }
             filterData = filterByBrand(data, brands);
-            drawBubbleChart(dataByBrand(dataByPrice(filterData, priceSlider1.value, priceSlider2.value)));
+            drawChart(selected_tab, filterData);
         }); 
     })
+
+    //update tabs
+    var tabs = document.querySelectorAll(".tabs_wrap ul li");
+    tabs.forEach(tab=>{
+        tab.addEventListener("click",()=>{
+            
+            tabs.forEach(tab=>{
+                tab.classList.remove("activate");
+            })
+            tab.classList.add("activate");
+
+            selected_tab = tab.getAttribute("data-tabs");
+
+            filterData = filterByBrand(data, brands);
+            drawChart(selected_tab, filterData);
+        });
+    })
+
 
     // update minimun value
     priceSlider1.onchange = debounce(()=>{
         filterData = filterByBrand(data, brands);
-        drawBubbleChart(dataByBrand(dataByPrice(filterData, priceSlider1.value, priceSlider2.value)));
+        drawChart(selected_tab, filterData);
     })
 
     // update maximun value
     priceSlider2.onchange = debounce(()=>{
         filterData = filterByBrand(data, brands);
-        drawBubbleChart(dataByBrand(dataByPrice(filterData, priceSlider1.value, priceSlider2.value)));
+        drawChart(selected_tab, filterData);
     })
 });
