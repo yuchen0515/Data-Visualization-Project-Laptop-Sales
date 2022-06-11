@@ -127,17 +127,39 @@ function setTooltip() {
                       .attr('class', 'd3-tip');
 
     tooltip.html(
-        d => `
-            <div>brand: ${d.cluster}</div>
-        `
+        function(d) {
+
+            var brandPercent = roundTwoFix(d.data.model_count * 100 / d.data.total);
+
+            var str = `
+                <center>${d.cluster}</center>
+                <center>count: ${d.data.model_count} / per. ${brandPercent} %
+                <div>--------------------</div>
+            `;
+
+            d.data.modelArray.forEach(function(el) {
+
+                var modelPercent = roundTwoFix(el[1] * 100 / d.data.model_count);
+
+                str += `
+                    <div>${el[0]}: ${el[1]} (${modelPercent} %)</div>
+                `;
+
+            })
+
+            return str;
+        }
     )
 
     return tooltip;
 }
-        `
+
 const tooltip = setTooltip();
 bubbleChart.call(tooltip);
 
+function roundTwoFix(number) {
+    return Math.round(number * 100) / 100;
+}
 
 // ---------------------------//
 //      DRAW BUBBLE CHART     //
