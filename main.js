@@ -76,17 +76,25 @@ dataset.then(datas=>{
 var dataByBrand = function(datas)
 {
     let dataset_by_brands = Object()
+    var size = Object.keys(datas).length;
+
     for (let [key, value] of Object.entries(datas))
     {
         if (!(value.brand in dataset_by_brands))
         {
-            dataset_by_brands[value.brand] = 1
+            dataset_by_brands[value.brand] = Object();
+            dataset_by_brands[value.brand].total = 0;
+            dataset_by_brands[value.brand].brandTotal = size;
+            dataset_by_brands[value.brand].brand_data = Object();
         }
-        else
-        {
-            dataset_by_brands[value.brand]+=1
+        dataset_by_brands[value.brand].total += 1;
+        
+        if (!(value.model in dataset_by_brands[value.brand].brand_data)) {
+            dataset_by_brands[value.brand].brand_data[value.model] = 0;
         }
+        dataset_by_brands[value.brand].brand_data[value.model] += 1;
     };
+
     return dataset_by_brands;
 }
 
@@ -120,14 +128,39 @@ var drawBubbleChart = function(datas)
 {
     // radius scale
     var rScale = d3.scaleLinear()
-                   .domain([0, d3.max(d3.entries(datas), d => d.value)])
+                   .domain([0, d3.max(d3.entries(datas), d => d.value.total)])
                    .range([50, 70])
 
     var nodes = Array();
+
     for (let [key, value] of Object.entries(datas))
     {
-        let obj = {cluster: key, radius: (value)}
-        nodes.push(obj)
+        if (key == "undefined") {
+            continue;
+        }
+
+        var brand_data = Object.entries(value.brand_data)
+            .sort(function(a, b) {
+                if (b[1] - a[1]) {
+                    return b[1] - a[1];
+                }
+                if (a[0] == b[0]) {
+                    return 0;
+                }
+                return a[0] >= b[0] ? 1 : -1;
+            });
+
+        let obj = {
+            cluster: key,
+            radius: (value.total),
+            data: {
+                modelArray: brand_data,
+                model_count: value.total,
+                total: value.brandTotal
+            },
+        };
+
+        nodes.push(obj);
     };
 
     
