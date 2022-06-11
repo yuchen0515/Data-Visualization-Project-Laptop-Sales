@@ -38,6 +38,8 @@ const WIDTH = 944 - MARGIN.left - MARGIN.right,
     padding = 1.5,      // seperation between same-color circles
     clusterpadding = 6. // seperation between different-color circles
 
+const price_step = 5000;
+
 const svg = d3.select("#bubble-chart").append("svg")
             .attr("width", WIDTH + MARGIN.left + MARGIN.right)
             .attr("height", HEIGHT + MARGIN.top + MARGIN.bottom)
@@ -123,14 +125,17 @@ var dataByPrice = function(datas)
     let dataset_by_price = Object()
     for (let [key, value] of Object.entries(datas))
     {
-        let rounded_price = Math.round(value.latest_price / 1000) * 1000;
+        let rounded_price = Math.round(value.latest_price / price_step) * price_step;
         if (!(rounded_price in dataset_by_price))
         {
-            dataset_by_price[rounded_price] = [{brand:value.brand}];
+            dataset_by_price[rounded_price] = {[value.brand]:1};
         }
         else
         {
-            dataset_by_price[rounded_price].push({brand:value.brand});
+            if (value.brand in dataset_by_price[rounded_price])
+                dataset_by_price[rounded_price][value.brand] += 1;
+            else    
+                dataset_by_price[rounded_price][value.brand] = 1;
         }
     };
     return dataset_by_price;
@@ -218,12 +223,11 @@ var priceColor = function(datas)
     let brand_color = brandColor(datas['brand']);
     brand_color = ["darkgrey", brand_color];
     
-    let min_price_rounded = Math.round(priceSlider1.value / 1000) * 1000;
-    let max_price_rounded = Math.round(priceSlider2.value / 1000) * 1000;
+    let min_price_rounded = Math.round(priceSlider1.value / price_step) * price_step;
+    let max_price_rounded = Math.round(priceSlider2.value / price_step) * price_step;
     let price_interval = [min_price_rounded, max_price_rounded];
 
-    let pcScale = d3.scaleLinear()
-                    .domain(price_interval)
+    let pcScale = d3.scaleLinear().domain(price_interval)
                     .range(brand_color);
 
     return pcScale(parseInt(datas.cluster));
@@ -333,11 +337,17 @@ var drawBubbleChart = function(datas)
 
 var drawNumericBubbleChart = function(datas)
 {
-    let brand_list =  Object.values(datas).map(function(d) {return d[0]['brand']});
+    let brand_list =  Object.values(datas).map(function(d) {return Object.keys(d)});
+    let brand_location = [];
+    brand_list = brand_list.reduce( (arr, val)=>{return arr.concat(val)}, []);
     brand_list = [...new Set(brand_list)];
+    for (let i=0;i<=WIDTH;i+=WIDTH/brand_list.length) brand_location.push(i);
+    
     var xScale = d3.scaleOrdinal()
                .domain(brand_list)
-               .range(brand_list.map((x,i) => i*50));
+               .range(brand_location);
+
+    bubbleChart.selectAll(".xAxis").remove();
 
     bubbleChart.append('g')
         .attr("class", "xAxis")
@@ -345,31 +355,48 @@ var drawNumericBubbleChart = function(datas)
         .call(d3.axisBottom().scale(xScale));
 
     // radius scale
+    var max_num = 0;
+    for (let [key, value] of Object.entries(datas))
+    {
+        for ( let [k, val] of Object.entries(value))
+        {
+            max_num = Math.max(val, max_num);
+        }
+    }
     var rScale = d3.scaleLinear()
-                   .domain([0, d3.max(d3.entries(datas), d => d.value.length)])
-                   .range([10, 50])
+                   .domain([0, max_num])
+                   .range([20, 30])
 
     var nodes = Array();
     for (let [key, value] of Object.entries(datas))
     {
-        let obj = {cluster: key, brand:value[0]['brand'], radius: (value.length)}
-        nodes.push(obj)
+        for ( let [k, val] of Object.entries(value))
+        {
+            let obj = {cluster: key, brand:k, radius: val};
+            nodes.push(obj);
+        }
     };
-    
+
     // ---------------------------//
     //     FORCE SIMULATION       //
     // ---------------------------//
+    let min_price_rounded = Math.round(priceSlider1.value / price_step) * price_step;
+    let max_price_rounded = Math.round(priceSlider2.value / price_step) * price_step;
+    let price_steps = [];
+    for (let i=min_price_rounded;i<max_price_rounded;i+=price_step) price_steps.push(i);
+    let price_location = [];
+    for (let i=HEIGHT;i>=0;i-=HEIGHT/price_steps.length) price_location.push(i);
 
     // y force scale
     var yfScale = d3.scaleThreshold()
-                    .domain([0,10 ,50 ,100 ,200])
-                    .range([900, 700, 400, 100])
+                    .domain(price_steps)
+                    .range(price_location)
 
     var simulation = d3.forceSimulation(nodes)
-                  .force('charge', d3.forceManyBody().strength(70))
-                  .force('center', d3.forceCenter(WIDTH/2, HEIGHT/2)   )
-                  .force('yForce', d3.forceY(d=>yfScale(d.radius)).strength(0.1))
-                  .force('collision', d3.forceCollide().radius(d=>rScale(d.radius)))
+                  .force('charge', d3.forceManyBody().strength(2))
+                  .force('xForce', d3.forceX(d=>xScale(d.brand)).strength(2))
+                  .force('yForce', d3.forceY(d=>yfScale(parseInt(d.cluster))).strength(2))
+                //   .force('collision', d3.forceCollide().radius(d=>rScale(d.radius)))
                   .on('tick', ticked);   
 
 
