@@ -33,7 +33,7 @@ const MARGIN = {
     bottom: 100
 };
 
-const WIDTH = 632 - MARGIN.left - MARGIN.right,
+const WIDTH = 944 - MARGIN.left - MARGIN.right,
     HEIGHT = 816 - MARGIN.top - MARGIN.bottom,
     padding = 1.5,      // seperation between same-color circles
     clusterpadding = 6. // seperation between different-color circles
@@ -47,6 +47,8 @@ const svg = d3.select("#bubble-chart").append("svg")
 //        BUBBLE CHART        //
 // ---------------------------//
 const bubbleChart = svg.append("g")
+    .attr("width", WIDTH)
+    .attr("height", HEIGHT)
     .attr("transform", `translate(${MARGIN.left},${MARGIN.right})`)
 
 
@@ -55,8 +57,9 @@ const bubbleChart = svg.append("g")
 // ---------------------------//
 
 // X scale
-// var xScale = d3.scaleLinear()
-//                .domain(d3.extent())
+// var xScale = d3.scaleOrdinal()
+//                .domain(d3.extent(uniBrands()))
+//                .range()
 
 // Y scale
 // var yScale = d3.scaleLinear()
@@ -100,16 +103,16 @@ var dataByBrand = function(datas)
 
 var dataByCPU = function(datas)
 {
-    let dataset_by_cpu = Object()
+    let dataset_by_cpu = Object();
     for (let [key, value] of Object.entries(datas))
     {
         if (!(value.processor_brand in dataset_by_cpu))
         {
-            dataset_by_cpu[value.processor_brand] = 1
+            dataset_by_cpu[value.processor_brand] = 1;
         }
         else
         {
-            dataset_by_cpu[value.processor_brand]+=1
+            dataset_by_cpu[value.processor_brand]+=1;
         }
     };
     return dataset_by_cpu;
@@ -120,14 +123,14 @@ var dataByPrice = function(datas)
     let dataset_by_price = Object()
     for (let [key, value] of Object.entries(datas))
     {
-        let rounded_price = Math.round(value.latest_price / 1000) * 1000
+        let rounded_price = Math.round(value.latest_price / 1000) * 1000;
         if (!(rounded_price in dataset_by_price))
         {
-            dataset_by_price[rounded_price] = 1
+            dataset_by_price[rounded_price] = [{brand:value.brand}];
         }
         else
         {
-            dataset_by_price[rounded_price]+=1
+            dataset_by_price[rounded_price].push({brand:value.brand});
         }
     };
     return dataset_by_price;
@@ -209,6 +212,22 @@ bubbleChart.call(tooltip);
 function roundTwoFix(number) {
     return Math.round(number * 100) / 100;
 }
+
+var priceColor = function(datas) 
+{
+    let brand_color = brandColor(datas['brand']);
+    brand_color = ["darkgrey", brand_color];
+    
+    let min_price_rounded = Math.round(priceSlider1.value / 1000) * 1000;
+    let max_price_rounded = Math.round(priceSlider2.value / 1000) * 1000;
+    let price_interval = [min_price_rounded, max_price_rounded];
+
+    let pcScale = d3.scaleLinear()
+                    .domain(price_interval)
+                    .range(brand_color);
+
+    return pcScale(parseInt(datas.cluster));
+} 
 
 // ---------------------------//
 //      DRAW BUBBLE CHART     //
@@ -314,18 +333,28 @@ var drawBubbleChart = function(datas)
 
 var drawNumericBubbleChart = function(datas)
 {
+    let brand_list =  Object.values(datas).map(function(d) {return d[0]['brand']});
+    brand_list = [...new Set(brand_list)];
+    var xScale = d3.scaleOrdinal()
+               .domain(brand_list)
+               .range(brand_list.map((x,i) => i*50));
+
+    bubbleChart.append('g')
+        .attr("class", "xAxis")
+        .attr("transform", `translate(${MARGIN.left},${HEIGHT-MARGIN.bottom})`)
+        .call(d3.axisBottom().scale(xScale));
+
     // radius scale
     var rScale = d3.scaleLinear()
-                   .domain([0, d3.max(d3.entries(datas), d => d.value)])
-                   .range([50, 70])
+                   .domain([0, d3.max(d3.entries(datas), d => d.value.length)])
+                   .range([10, 50])
 
     var nodes = Array();
     for (let [key, value] of Object.entries(datas))
     {
-        let obj = {cluster: key, radius: (value)}
+        let obj = {cluster: key, brand:value[0]['brand'], radius: (value.length)}
         nodes.push(obj)
     };
-
     
     // ---------------------------//
     //     FORCE SIMULATION       //
@@ -339,7 +368,7 @@ var drawNumericBubbleChart = function(datas)
     var simulation = d3.forceSimulation(nodes)
                   .force('charge', d3.forceManyBody().strength(70))
                   .force('center', d3.forceCenter(WIDTH/2, HEIGHT/2)   )
-                  .force('yForce', d3.forceY(d=>yfScale(d.radius)).strength(0.01))
+                  .force('yForce', d3.forceY(d=>yfScale(d.radius)).strength(0.1))
                   .force('collision', d3.forceCollide().radius(d=>rScale(d.radius)))
                   .on('tick', ticked);   
 
@@ -367,7 +396,7 @@ var drawNumericBubbleChart = function(datas)
                     .attr('cy', d => d.y)
                     .attr('r', d => rScale(d.radius))
                     .attr("fill", function (d) {
-                        return brandColor(d.cluster);
+                        return priceColor(d);
                     } )
                     .style("opacity", "0.6")
                     .on("mouseover", showTooltip_Circle)
@@ -389,7 +418,7 @@ var drawNumericBubbleChart = function(datas)
                .attr('dy', "0.4em")
                .attr('text-anchor', 'middle')
                .attr('fill', 'white')
-               .style('font-size',d => rScale(d.radius)-35+"px")
+               .style('font-size',d => rScale(d.radius)-9+"px")
                .text(d => d.cluster)
                .on("mouseover", showTooltip_Label)
                .on("mouseout", tooltip.hide);
