@@ -119,6 +119,24 @@ var brandColor = d3.scaleOrdinal()
     }))
     .range(d3.schemeAccent);
 
+// ---------------------------//
+//           TOOLTIP          //
+// ---------------------------//
+function setTooltip() {
+    const tooltip = d3.tip()
+                      .attr('class', 'd3-tip');
+
+    tooltip.html(
+        d => `
+            <div>brand: ${d.cluster}</div>
+        `
+    )
+
+    return tooltip;
+}
+        `
+const tooltip = setTooltip();
+bubbleChart.call(tooltip);
 
 
 // ---------------------------//
@@ -190,6 +208,13 @@ var drawBubbleChart = function(datas)
     bubbleChart.selectAll("circle").remove();
     bubbleChart.selectAll("text").remove();
 
+    var showTooltip_Circle = function(d) {
+        tooltip
+            .offset([-10, 0]);
+
+        tooltip.show(d);
+    }
+
     const circles = bubbleChart.selectAll('.node')
                     .data(nodes)
                     .enter()
@@ -201,6 +226,15 @@ var drawBubbleChart = function(datas)
                         return brandColor(d.cluster);
                     } )
                     .style("opacity", "0.6")
+                    .on("mouseover", showTooltip_Circle)
+                    .on("mouseout", tooltip.hide)
+
+    var showTooltip_Label = function(d) {
+        tooltip
+            .offset([-rScale(d.radius), 0]);
+
+        tooltip.show(d);
+    }
 
     const labels = bubbleChart.selectAll('.label')
                .data(nodes)
@@ -213,6 +247,8 @@ var drawBubbleChart = function(datas)
                .attr('fill', 'white')
                .style('font-size',d => rScale(d.radius)-35+"px")
                .text(d => d.cluster)
+               .on("mouseover", showTooltip_Label)
+               .on("mouseout", tooltip.hide);
 
     function ticked()
     {
