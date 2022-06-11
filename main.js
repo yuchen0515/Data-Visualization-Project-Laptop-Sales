@@ -399,6 +399,12 @@ var drawNumericBubbleChart = function(datas)
                 //   .force('collision', d3.forceCollide().radius(d=>rScale(d.radius)))
                   .on('tick', ticked);   
 
+    bubbleChart.selectAll(".yAxis").remove();
+
+    bubbleChart.append('g')
+        .attr("class", "yAxis")
+        .attr("transform", `translate(${MARGIN.left},${0})`)
+        .call(d3.axisLeft().scale(yfScale).ticks(20));
 
     // ---------------------------//
     //           BUBBLES          //
