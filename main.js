@@ -132,20 +132,34 @@ function setTooltip() {
             var brandPercent = roundTwoFix(d.data.model_count * 100 / d.data.total);
 
             var str = `
-                <center>${d.cluster}</center>
+                <center>
+                    <h2>${d.cluster}</h2>
+                </center>
                 <center>count: ${d.data.model_count} / per. ${brandPercent} %
-                <div>--------------------</div>
-            `;
+                <hr class="solid" />
+                <table>
+                    <tr>
+                        <th> model </th>
+                        <th> count(per.) </th>
+                    </tr>
+            `;  
 
             d.data.modelArray.forEach(function(el) {
 
                 var modelPercent = roundTwoFix(el[1] * 100 / d.data.model_count);
 
+                // <div>${el[0]}: ${el[1]} (${modelPercent} %)</div>
                 str += `
-                    <div>${el[0]}: ${el[1]} (${modelPercent} %)</div>
+                    <tr>
+                        <td> ${el[0]}  </td>
+                        <td> ${el[1]} (${modelPercent} %) </td>
+                    </tr>
                 `;
 
             })
+            str += `
+                </table>
+            `
 
             return str;
         }
@@ -231,8 +245,10 @@ var drawBubbleChart = function(datas)
     bubbleChart.selectAll("text").remove();
 
     var showTooltip_Circle = function(d) {
+        console.log(d)
+        height = d.data.model_count
         tooltip
-            .offset([-10, 0]);
+            .offset([rScale(d.radius) + height * 1.5 + 50, 2.3 * rScale(d.radius)]);
 
         tooltip.show(d);
     }
@@ -253,7 +269,7 @@ var drawBubbleChart = function(datas)
 
     var showTooltip_Label = function(d) {
         tooltip
-            .offset([-rScale(d.radius), 0]);
+            .offset([height * 1.5 + 75, 2.3 * rScale(d.radius)]);
 
         tooltip.show(d);
     }
