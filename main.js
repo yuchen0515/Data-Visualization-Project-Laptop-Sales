@@ -298,6 +298,8 @@ var drawBubbleChart = function(datas)
     // ---------------------------//
     bubbleChart.selectAll("circle").remove();
     bubbleChart.selectAll("text").remove();
+    bubbleChart.selectAll(".xAxis").remove();
+    bubbleChart.selectAll(".yAxis").remove();
 
     const circles = bubbleChart.selectAll('.node')
                     .data(nodes)
