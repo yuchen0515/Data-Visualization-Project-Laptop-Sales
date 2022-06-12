@@ -180,6 +180,13 @@ function setTooltip() {
 
     tooltip.html(
         function(d) {
+            var type = "";
+
+            if (typeof(d.data.modelArray[0][1]) == "number") {
+                type = "brand";
+            } else if (typeof(d.data.modelArray[0][1]) == "object") {
+                type = "cpu";
+            }
 
             var brandPercent = roundTwoFix(d.data.model_count * 100 / d.data.total);
 
@@ -189,26 +196,53 @@ function setTooltip() {
                 </center>
                 <center>count: ${d.data.model_count} / per. ${brandPercent} %
                 <hr class="solid" />
-                <table>
-                    <tr>
-                        <th> model </th>
-                        <th> count(per.) </th>
-                    </tr>
-            `;  
+            `;
 
-            d.data.modelArray.forEach(function(el) {
 
-                var modelPercent = roundTwoFix(el[1] * 100 / d.data.model_count);
-
-                // <div>${el[0]}: ${el[1]} (${modelPercent} %)</div>
+            if (type == "brand") {
                 str += `
+                    <table>
+                        <tr>
+                            <th> model </th>
+                            <th> count(per.) </th>
+                        </tr>
+                `;  
+
+                d.data.modelArray.forEach(function(el) {
+
+                    var modelPercent = roundTwoFix(el[1] * 100 / d.data.model_count);
+
+                    str += `
                     <tr>
                         <td> ${el[0]}  </td>
                         <td> ${el[1]} (${modelPercent} %) </td>
                     </tr>
                 `;
 
-            })
+                })
+            } else if (type == "cpu") {
+                console.log("hi")
+                str += `
+                    <table>
+                        <tr>
+                            <th> brand </th>
+                            <th> model </th>
+                            <th> count(per.) </th>
+                        </tr>
+                `;  
+                d.data.modelArray.forEach(function(el) {
+
+                    var modelPercent = roundTwoFix(el[1].value * 100 / d.data.model_count);
+
+                    str += `
+                        <tr>
+                            <td> ${el[1].brand}  </td>
+                            <td> ${el[0]}  </td>
+                            <td> ${el[1].value} (${modelPercent} %) </td>
+                        </tr>
+                    `;
+                })
+            }
             str += `
                 </table>
             `
@@ -282,11 +316,27 @@ var drawBubbleChart = function(datas)
                 model_count: value.total,
                 total: value.brandTotal
             }
+        } else if (type == "cpu") {
+            var cpu_data = Object.entries(value.cpu_data)
+                .sort(function(a, b) {
+                    if (b[1].value - a[1].value) {
+                        return b[1].value - a[1].value;
+                    }
+                    if (a[0] == b[0]) {
+                        return 0;
+                    }
+                    return a[0] >= b[0] ? 1 : -1;
+                });
+            obj.data = {
+                modelArray: cpu_data,
+                model_count: value.total,
+                total: value.brandTotal
+            }
         }
-
         nodes.push(obj);
     };
 
+    console.log(nodes)
 
     // ---------------------------//
     //     FORCE SIMULATION       //
