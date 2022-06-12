@@ -106,16 +106,25 @@ var dataByBrand = function(datas)
 var dataByCPU = function(datas)
 {
     let dataset_by_cpu = Object();
+    var size = Object.keys(datas).length;
+
     for (let [key, value] of Object.entries(datas))
     {
         if (!(value.processor_brand in dataset_by_cpu))
         {
-            dataset_by_cpu[value.processor_brand] = 1;
+            dataset_by_cpu[value.processor_brand] = Object();
+            dataset_by_cpu[value.processor_brand].total = 0;
+            dataset_by_cpu[value.processor_brand].brandTotal = size;
+            dataset_by_cpu[value.processor_brand].cpu_data = Object();
         }
-        else
-        {
-            dataset_by_cpu[value.processor_brand]+=1;
+        dataset_by_cpu[value.processor_brand].total += 1;
+
+        if (!(value.model in dataset_by_cpu[value.processor_brand].cpu_data)) {
+            dataset_by_cpu[value.processor_brand].cpu_data[value.model] = Object();
+            dataset_by_cpu[value.processor_brand].cpu_data[value.model].value = 0;
+            dataset_by_cpu[value.processor_brand].cpu_data[value.model].brand = value.brand;
         }
+        dataset_by_cpu[value.processor_brand].cpu_data[value.model].value += 1;
     };
     return dataset_by_cpu;
 }
