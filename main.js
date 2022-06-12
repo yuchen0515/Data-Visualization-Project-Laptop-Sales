@@ -244,6 +244,7 @@ var drawBubbleChart = function(datas)
                    .range([50, 70])
 
     var nodes = Array();
+    var type = detDataBasedCatogory(datas);
 
     for (let [key, value] of Object.entries(datas))
     {
@@ -251,46 +252,48 @@ var drawBubbleChart = function(datas)
             continue;
         }
 
-        var brand_data = Object.entries(value.brand_data)
-            .sort(function(a, b) {
-                if (b[1] - a[1]) {
-                    return b[1] - a[1];
-                }
-                if (a[0] == b[0]) {
-                    return 0;
-                }
-                return a[0] >= b[0] ? 1 : -1;
-            });
-
         let obj = {
             cluster: key,
-            radius: (value.total),
-            data: {
+            radius: (value.total)
+        };
+
+        if (type == "brand") {
+            var brand_data = Object.entries(value.brand_data)
+                .sort(function(a, b) {
+                    if (b[1] - a[1]) {
+                        return b[1] - a[1];
+                    }
+                    if (a[0] == b[0]) {
+                        return 0;
+                    }
+                    return a[0] >= b[0] ? 1 : -1;
+                });
+            obj.data = {
                 modelArray: brand_data,
                 model_count: value.total,
                 total: value.brandTotal
-            },
-        };
+            }
+        }
 
         nodes.push(obj);
     };
 
-    
+
     // ---------------------------//
     //     FORCE SIMULATION       //
     // ---------------------------//
 
     // y force scale
     var yfScale = d3.scaleThreshold()
-                    .domain([0,10 ,50 ,100 ,200])
-                    .range([900, 700, 400, 100])
+        .domain([0,10 ,50 ,100 ,200])
+        .range([900, 700, 400, 100])
 
     var simulation = d3.forceSimulation(nodes)
-                  .force('charge', d3.forceManyBody().strength(70))
-                  .force('center', d3.forceCenter(WIDTH/2, HEIGHT/2)   )
-                  .force('yForce', d3.forceY(d=>yfScale(d.radius)).strength(0.01))
-                  .force('collision', d3.forceCollide().radius(d=>rScale(d.radius)))
-                  .on('tick', ticked);   
+        .force('charge', d3.forceManyBody().strength(70))
+        .force('center', d3.forceCenter(WIDTH/2, HEIGHT/2)   )
+        .force('yForce', d3.forceY(d=>yfScale(d.radius)).strength(0.01))
+        .force('collision', d3.forceCollide().radius(d=>rScale(d.radius)))
+        .on('tick', ticked);   
 
 
     // ---------------------------//
@@ -301,29 +304,48 @@ var drawBubbleChart = function(datas)
     bubbleChart.selectAll(".xAxis").remove();
     bubbleChart.selectAll(".yAxis").remove();
 
+    var showTooltip_Circle = function(d) {
+        console.log(d)
+        height = d.data.model_count
+        tooltip
+            .offset([rScale(d.radius) + height * 1.5 + 50, 2.3 * rScale(d.radius)]);
+        tooltip.show(d);
+    }
+
     const circles = bubbleChart.selectAll('.node')
-                    .data(nodes)
-                    .enter()
-                    .append("circle")
-                    .attr('cx', d => d.x)
-                    .attr('cy', d => d.y)
-                    .attr('r', d => rScale(d.radius))
-                    .attr("fill", function (d) {
-                        return brandColor(d.cluster);
-                    } )
-                    .style("opacity", "0.6")
+                        .data(nodes)
+                        .enter()
+                        .append("circle")
+                        .attr('cx', d => d.x)
+                        .attr('cy', d => d.y)
+                        .attr('r', d => rScale(d.radius))
+                        .attr("fill", function (d) {
+                            return brandColor(d.cluster);
+                        } )
+                        .style("opacity", "0.6")
+                        .on("mouseover", showTooltip_Circle)
+                        .on("mouseout", tooltip.hide)
+
+    var showTooltip_Label = function(d) {
+        tooltip
+            .offset([height * 1.5 + 75, 2.3 * rScale(d.radius)]);
+
+        tooltip.show(d);
+    }
 
     const labels = bubbleChart.selectAll('.label')
-               .data(nodes)
-               .enter()
-               .append('text')
-               .attr('x', d => d.x)
-               .attr('y', d => d.y)
-               .attr('dy', "0.4em")
-               .attr('text-anchor', 'middle')
-               .attr('fill', 'white')
-               .style('font-size',d => rScale(d.radius)-35+"px")
-               .text(d => d.cluster)
+                .data(nodes)
+                .enter()
+                .append('text')
+                .attr('x', d => d.x)
+                .attr('y', d => d.y)
+                .attr('dy', "0.4em")
+                .attr('text-anchor', 'middle')
+                .attr('fill', 'white')
+                .style('font-size',d => rScale(d.radius)-35+"px")
+                .text(d => d.cluster)
+                .on("mouseover", showTooltip_Label)
+                .on("mouseout", tooltip.hide);
 
     function ticked()
     {
@@ -332,8 +354,8 @@ var drawBubbleChart = function(datas)
             .attr('cy', d => d.y)
 
         labels
-          .attr('x', d=>d.x)
-          .attr('y', d=>d.y)
+            .attr('x', d=>d.x)
+            .attr('y', d=>d.y)
     }
 }
 
@@ -344,10 +366,10 @@ var drawNumericBubbleChart = function(datas)
     brand_list = brand_list.reduce( (arr, val)=>{return arr.concat(val)}, []);
     brand_list = [...new Set(brand_list)];
     for (let i=0;i<=WIDTH;i+=WIDTH/brand_list.length) brand_location.push(i);
-    
+
     var xScale = d3.scaleOrdinal()
-               .domain(brand_list)
-               .range(brand_location);
+        .domain(brand_list)
+        .range(brand_location);
 
     bubbleChart.selectAll(".xAxis").remove();
 
@@ -366,8 +388,8 @@ var drawNumericBubbleChart = function(datas)
         }
     }
     var rScale = d3.scaleLinear()
-                   .domain([0, max_num])
-                   .range([20, 30])
+        .domain([0, max_num])
+        .range([20, 30])
 
     var nodes = Array();
     for (let [key, value] of Object.entries(datas))
@@ -391,15 +413,15 @@ var drawNumericBubbleChart = function(datas)
 
     // y force scale
     var yfScale = d3.scaleThreshold()
-                    .domain(price_steps)
-                    .range(price_location)
+        .domain(price_steps)
+        .range(price_location)
 
     var simulation = d3.forceSimulation(nodes)
-                  .force('charge', d3.forceManyBody().strength(2))
-                  .force('xForce', d3.forceX(d=>xScale(d.brand)).strength(2))
-                  .force('yForce', d3.forceY(d=>yfScale(parseInt(d.cluster))).strength(2))
-                //   .force('collision', d3.forceCollide().radius(d=>rScale(d.radius)))
-                  .on('tick', ticked);   
+        .force('charge', d3.forceManyBody().strength(2))
+        .force('xForce', d3.forceX(d=>xScale(d.brand)).strength(2))
+        .force('yForce', d3.forceY(d=>yfScale(parseInt(d.cluster))).strength(2))
+    //   .force('collision', d3.forceCollide().radius(d=>rScale(d.radius)))
+        .on('tick', ticked);   
 
     bubbleChart.selectAll(".yAxis").remove();
 
@@ -465,9 +487,30 @@ var drawNumericBubbleChart = function(datas)
             .attr('cy', d => d.y)
 
         labels
-          .attr('x', d=>d.x)
-          .attr('y', d=>d.y)
+            .attr('x', d=>d.x)
+            .attr('y', d=>d.y)
     }
+}
+
+function detDataBasedCatogory(datas) {
+    if (!datas)
+    {
+        return;
+    }
+
+    var type = "";
+    var brand = Object.entries(datas)[0][1].brand_data;
+    var cpu = Object.entries(datas)[0][1].cpu_data;
+
+    if (brand) {
+        type = "brand";
+    } else if (cpu) {
+        type = "cpu";
+    } else {
+        type = "numeric";
+    }
+
+    return type;
 }
 
 var drawChart = function(selected_tab, filterData)
@@ -558,8 +601,8 @@ var debounce = function(func, wait, immediate) {
     return function() {
         var context = this, args = arguments;
         var later = function() {
-        timeout = null;
-        if (!immediate) result = func.apply(context, args);
+            timeout = null;
+            if (!immediate) result = func.apply(context, args);
         };
         var callNow = immediate && !timeout;
         clearTimeout(timeout);
@@ -641,7 +684,7 @@ dataset.then(function(data) {
     var tabs = document.querySelectorAll(".tabs_wrap ul li");
     tabs.forEach(tab=>{
         tab.addEventListener("click",()=>{
-            
+
             tabs.forEach(tab=>{
                 tab.classList.remove("activate");
             })
