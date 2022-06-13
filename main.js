@@ -697,21 +697,28 @@ var debounce = function(func, wait, immediate) {
 
 
 var drawCheckbox = function(brands) {
-    var el = document.getElementById("controller-chart");
+    var el = document.getElementById("checkbox-wrapper");
+
+    console.log(el)
 
     brands.forEach(function(d, i) {
         var elCheckbox = document.createElement('brand-checkbox');
-
-        var str = '<input type="checkbox" style="white-space:pre" class="brand-checkbox" value="' + d + '" name="brand_' + d + '" checked>';
+        elCheckbox.className = "checkbox";
+        // var str = '<input type="checkbox" value="' + d + '" name="brand_' + d + '" checked>';
+        var str = '<input type="checkbox" style="white-space:pre" class="brand-checkbox" value="' + d + '" name="brand_' + d + '" checked />';
 
         var textBackgroundColor = '<span style="background-color:';
         textBackgroundColor += brandColor(d);
         textBackgroundColor += ';">&emsp; &emsp; </span>';
 
-        str += d;
-        str += '&#9;';
+        // str += '<div>'
+        // str += '&#9;';
+        str += '&emsp;';
+        // str += '</div>'
         str += textBackgroundColor;
-        str += '&emsp; &emsp; &#9;';
+        str += '&emsp;';
+        str += d;
+        // str += '</div>'
 
         if (i != 0 && (i + 1) % 2 == 0) {
             str += '<br>';
