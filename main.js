@@ -353,7 +353,7 @@ var drawBubbleChart = function(datas)
         nodes.push(obj);
     };
 
-    console.log(nodes)
+    drawHistogram(nodes);
 
     // ---------------------------//
     //     FORCE SIMULATION       //
@@ -573,6 +573,106 @@ var drawNumericBubbleChart = function(datas)
             .attr('x', d=>d.x)
             .attr('y', d=>d.y)
     }
+}
+
+
+const HIS_LEFT = 0, HIS_TOP = 50;
+const HIS_TOTAL_WIDTH = 400, HIS_TOTAL_HEIGHT = 450;
+
+const HIS_MARGIN = {
+    LEFT: 30,
+    RIGHT: 3,
+    TOP: 3,
+    BOTTOM: 70
+};
+
+const HIS_WIDTH = HIS_TOTAL_WIDTH - HIS_MARGIN.LEFT - HIS_MARGIN.RIGHT;
+const HIS_HEIGHT = HIS_TOTAL_HEIGHT - HIS_MARGIN.TOP - HIS_MARGIN.BOTTOM;
+
+const histogramChart = d3.select("#hist-chart").append('svg')
+    .attr("width", HIS_WIDTH + HIS_MARGIN.LEFT + HIS_MARGIN.RIGHT)
+    .attr("height", HIS_HEIGHT + HIS_MARGIN.TOP + HIS_MARGIN.BOTTOM)
+
+
+// param: nodes <-- datas
+function drawHistogram(datas) {
+    histogramChart.selectAll("rect").remove();
+    histogramChart.selectAll("text").remove();
+    histogramChart.selectAll(".xAxis").remove();
+    histogramChart.selectAll(".yAxis").remove();
+
+    var type = "";
+
+    // Find datas type
+    for (let [key, value] of Object.entries(datas)) {
+        for (let [brand, el] of Object.entries(value.data.modelArray)) {
+            if (typeof(el[1]) == "number") {
+                type = "brand";
+            } else if (typeof(el[1]) == "object") {
+                type = "cpu";
+            }
+            break;
+        }
+        break;
+    }
+
+
+    const g = histogramChart.append("g")
+        .attr("transform", `translate(${HIS_MARGIN.LEFT}, ${HIS_MARGIN.TOP})`);
+
+    var x = d3.scaleBand()
+        .domain(datas.map((d) => d.cluster))
+        .range([0, HIS_WIDTH])
+        .paddingInner(0.1)
+        .paddingOuter(0.2);
+
+    var xAxis = d3.axisBottom(x)
+        .tickValues(datas.map((d) => d.cluster));
+
+    var yScale = d3.scaleLinear()
+        .domain(d3.extent(datas, d=>d.radius))
+        .range([HIS_HEIGHT, 0]);
+
+    g.append("g")
+        .attr("class", "yAxis")
+        .call(d3.axisLeft(yScale));
+
+    g.append("g")
+        .attr("class", "xAxis")
+        .attr("transform", "translate(0," + HIS_HEIGHT + ")")
+        .call(xAxis)
+        .selectAll("text")
+        .attr("x", -35)
+        .attr("y", 0)
+        .attr("transform", "rotate(-80)");
+
+    g.append("text")
+        .attr("x", HIS_WIDTH / 2)
+        .attr("y", HIS_HEIGHT + 70)
+        .attr("font-size", "12px")
+        .attr("text-anchor", "middle")
+        .text(type);
+
+    g.append("text")
+        .attr("x", - (HIS_HEIGHT / 2))
+        .attr("y", -40)
+        .attr("font-size", "12px")
+        .attr("text-anchor", "middle")
+        .attr("transform", "rotate(-90)")
+        .text("Count");
+
+    var rectG = g.append("g");
+    var rects = rectG.selectAll("rect")
+        .data(datas)
+        .enter()
+        .append("rect")
+        .attr("x", (d) => x(d.cluster))
+        .attr("y", (d) => yScale(d.radius))
+        .attr("width", x.bandwidth)
+        .attr("height", d => HIS_HEIGHT - yScale(d.radius))
+        .attr("fill", (d)=>brandColor(d.cluster))
+        .style("stroke", "black")
+        .style("stroke-width", 1);
 }
 
 function detDataBasedCatogory(datas) {
