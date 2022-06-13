@@ -230,18 +230,35 @@ function setTooltip() {
                             <th> count(per.) </th>
                         </tr>
                 `;  
+                cnt = 0
+                otherRate = 0
                 d.data.modelArray.forEach(function(el) {
-
+                    cnt ++
                     var modelPercent = roundTwoFix(el[1].value * 100 / d.data.model_count);
-
-                    str += `
-                        <tr>
-                            <td> ${el[1].brand}  </td>
-                            <td> ${el[0]}  </td>
-                            <td> ${el[1].value} (${modelPercent} %) </td>
-                        </tr>
-                    `;
+                    
+                    if(cnt < 35){
+                        str += `
+                            <tr>
+                                <td> ${el[1].brand}  </td>
+                                <td> ${el[0]}  </td>
+                                <td> ${el[1].value} (${modelPercent} %) </td>
+                            </tr>
+                        `;
+                    }
+                    else{
+                        otherRate += modelPercent
+                    }
                 })
+                if(cnt > 35)
+                    str += `
+                    <tr>
+                        <td colspan="2">
+                            Other Model
+                        </td>
+                    
+                        <td colspan="1"> ${ roundTwoFix(otherRate)} % </td>
+                    </tr>
+                `;
             }
             str += `
                 </table>
@@ -365,9 +382,13 @@ var drawBubbleChart = function(datas)
 
     var showTooltip_Circle = function(d) {
         console.log(d)
-        height = d.data.model_count
+        height = Math.min(d.data.modelArray.length, 35)
+        console.log(rScale(d.radius))
+        // console.log(height)
+        // height = d.data.model_count
+        // console.log(height)
         tooltip
-            .offset([rScale(d.radius) + height * 1.5 + 50, 2.3 * rScale(d.radius)]);
+            .offset([rScale(d.radius) + height * 10 + 50, 2.3 * rScale(d.radius)]);
         tooltip.show(d);
     }
 
@@ -387,7 +408,7 @@ var drawBubbleChart = function(datas)
 
     var showTooltip_Label = function(d) {
         tooltip
-            .offset([height * 1.5 + 75, 2.3 * rScale(d.radius)]);
+            .offset([height * 10 + 65, 2.3 * rScale(d.radius)]);
 
         tooltip.show(d);
     }
@@ -497,9 +518,12 @@ var drawNumericBubbleChart = function(datas)
 
     var showTooltip_Circle = function(d) {
         console.log(d)
+        // console.log('!')
         height = d.data.model_count
+        // console.log(rScale(d.radius) + height * 1.5 + 50 - d.y + 5000)
         tooltip
-            .offset([rScale(d.radius) + height * 1.5 + 50, 2.3 * rScale(d.radius)]);
+            // .offset([rScale(d.radius) + height * 1.5 + 50 - d.y + 5000, 2.3 * rScale(d.radius)]);
+            .offset([rScale(d.radius) + height * 1.5 + 50 , 2.3 * rScale(d.radius)]);
 
         tooltip.show(d);
     }
