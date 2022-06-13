@@ -259,15 +259,17 @@
         // reference:                               //
         // codepen.io/alvarotrigo/pen/bGoPzQw       //
         // -----------------------------------------*/
-        .tab .tabs_wrap{
-            padding: 20px;
+        /* .tab .tabs_wrap{
+            padding: 0px;
             border-bottom: 1px solid #ebedec;
-        }
+        } */
 
         .tab .tabs_wrap ul{
             display: -webkit-box;
             display: -ms-flexbox;
             display: flex;
+            padding-right: 2em;
+            list-style-type:none;
             -webkit-box-pack: center;
                 -ms-flex-pack: center;
                     justify-content: center;
@@ -298,10 +300,50 @@
 
         .tab .tabs_wrap ul li:hover,
         .tab .tabs_wrap ul li.active{
-            background: #7fc469;
+            background: lightseagreen;
             color: #fff;
         }
 
+        /* The checkbox holder */
+        /* grid-template-columns: 1fr 2fr;
+        grid-template-rows: 1fr; */
+        .checkbox-wrapper {
+            display: grid;
+            grid-auto-flow: row ;
+            grid-auto-rows: 30px ;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: unset;
+            overflow-y: scroll;
+            align-items: center;
+        }
+
+        /* The checkbox */
+        .checkbox > input {
+            /*
+                Remove the default appearance.
+            */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            -o-appearance: none;
+            appearance: none;
+            margin-left: 50px;
+            margin-bottom: -1px;
+            
+            
+            /*
+                Set the size of the checkbox.
+            */
+            width: 12px;
+            height: 12px;
+            
+            box-shadow: 0 0 0 2px black; /* Outer border */
+            border: 2px solid white; /* Inner border */
+        }
+
+        /* The checkbox - when checked */
+        .checkbox > input:checked {
+            background-color: black; /* The "check" */
+        }
     </style>
     <div class="wrapper">
         <div class="hist-box">
@@ -330,23 +372,25 @@
                     <input id="pSlider1" type="range" tabindex="0" value="0" max="100" min="0" step="1" />
                     <input id="pSlider2" type="range" tabindex="0" value="110" max="100" min="0" step="1" />
                 </div>
-                
+
+                <div id="bubble-chart" class="bubble-box-chart" background-color="transparent"></div>
+            </div>
+        </div>
+        <div class="controller-box">     
+            <div id="controller-chart">           
                 <div class="tab">
                     <div class="tabs_wrap">
                         <ul>
-                        <li data-tabs="brand" class=""active>Brand</li>
+                        <li data-tabs="brand" class="active">Brand</li>
                         <li data-tabs="cpu">CPU</li>
                         <li data-tabs="numeric">Numeric</li>
                         </ul>
                     </div>
                 </div>
-
-                <div id="bubble-chart" class="bubble-box-chart" background-color="transparent"></div>
+                <div id="checkbox-wrapper" class="checkbox-wrapper" style="height: 220px;">
+                    
+                </div>
             </div>
-        </div>
-        <div class="controller-box">
-            Controller
-            <div id="controller-chart"></div>
         </div>
     </div>
 
