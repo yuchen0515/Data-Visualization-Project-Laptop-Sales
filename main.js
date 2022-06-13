@@ -776,9 +776,9 @@ dataset.then(function(data) {
         tab.addEventListener("click",()=>{
 
             tabs.forEach(tab=>{
-                tab.classList.remove("activate");
+                tab.classList.remove("active");
             })
-            tab.classList.add("activate");
+            tab.classList.add("active");
 
             selected_tab = tab.getAttribute("data-tabs");
 
