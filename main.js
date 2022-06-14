@@ -622,7 +622,7 @@ const g = histogramChart.append("g")
 
 
 var update_histo = false;
-var rectG, rects;
+var rectG, rects, x_label;
 var histo_xAxis, histo_yAxis;
 
 // param: nodes <-- datas
@@ -677,7 +677,7 @@ function drawHistogram(datas) {
             .attr("fill", "black")
             .attr("transform", "rotate(-80)");
 
-        g.append("text")
+        x_label = g.append("text")
             .attr("x", HIS_WIDTH / 2)
             .attr("y", HIS_HEIGHT + 85)
             .attr("font-size", "20px")
@@ -708,6 +708,7 @@ function drawHistogram(datas) {
     }
     else{
         rectG.selectAll("rect").data(datas).exit().remove();
+        x_label.text(type);
 
         var t = d3.transition()
               .duration(1000);
