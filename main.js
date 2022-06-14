@@ -691,7 +691,12 @@ function drawHistogram(datas) {
 
         var new_yAxis = d3.axisLeft(yScale);
 
-        histo_xAxis.transition(t).call(new_xAxis);
+        function adjustText (selection)
+        {
+            selection.selectAll('text').attr('transform', `translate(${-9},${-1.5}) rotate(-80)`);
+        }
+
+        histo_xAxis.transition(t).call(new_xAxis).call(adjustText);
         histo_yAxis.transition(t).call(new_yAxis);
 
         histo_xAxis.selectAll("text")
