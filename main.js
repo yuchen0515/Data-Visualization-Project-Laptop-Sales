@@ -221,7 +221,6 @@ function setTooltip() {
 
                 })
             } else if (type == "cpu") {
-                console.log("hi")
                 str += `
                     <table>
                         <tr>
@@ -381,9 +380,9 @@ var drawBubbleChart = function(datas)
     bubbleChart.selectAll(".yAxis").remove();
 
     var showTooltip_Circle = function(d) {
-        console.log(d)
+        // console.log(d)
         height = Math.min(d.data.modelArray.length, 35)
-        console.log(rScale(d.radius))
+        // console.log(rScale(d.radius))
         // console.log(height)
         // height = d.data.model_count
         // console.log(height)
@@ -517,7 +516,7 @@ var drawNumericBubbleChart = function(datas)
     bubbleChart.selectAll("text").remove();
 
     var showTooltip_Circle = function(d) {
-        console.log(d)
+        // console.log(d)
         // console.log('!')
         height = d.data.model_count
         // console.log(rScale(d.radius) + height * 1.5 + 50 - d.y + 5000)
@@ -580,9 +579,9 @@ const HIS_LEFT = 0, HIS_TOP = 50;
 const HIS_TOTAL_WIDTH = 400, HIS_TOTAL_HEIGHT = 450;
 
 const HIS_MARGIN = {
-    LEFT: 30,
-    RIGHT: 3,
-    TOP: 3,
+    LEFT: 50,
+    RIGHT: 10,
+    TOP: 10,
     BOTTOM: 70
 };
 
@@ -593,13 +592,20 @@ const histogramChart = d3.select("#hist-chart").append('svg')
     .attr("width", HIS_WIDTH + HIS_MARGIN.LEFT + HIS_MARGIN.RIGHT)
     .attr("height", HIS_HEIGHT + HIS_MARGIN.TOP + HIS_MARGIN.BOTTOM)
 
+const g = histogramChart.append("g")
+    .attr("transform", `translate(${HIS_MARGIN.LEFT}, ${HIS_MARGIN.TOP})`);
+
+
+var update_histo = false;
+var rectG, rects;
+var histo_xAxis, histo_yAxis;
 
 // param: nodes <-- datas
 function drawHistogram(datas) {
-    histogramChart.selectAll("rect").remove();
-    histogramChart.selectAll("text").remove();
-    histogramChart.selectAll(".xAxis").remove();
-    histogramChart.selectAll(".yAxis").remove();
+    // histogramChart.selectAll("rect").remove();
+    // histogramChart.selectAll("text").remove();
+    // histogramChart.selectAll(".xAxis").remove();
+    // histogramChart.selectAll(".yAxis").remove();
 
     var type = "";
 
@@ -616,10 +622,6 @@ function drawHistogram(datas) {
         break;
     }
 
-
-    const g = histogramChart.append("g")
-        .attr("transform", `translate(${HIS_MARGIN.LEFT}, ${HIS_MARGIN.TOP})`);
-
     var x = d3.scaleBand()
         .domain(datas.map((d) => d.cluster))
         .range([0, HIS_WIDTH])
@@ -633,46 +635,93 @@ function drawHistogram(datas) {
         .domain(d3.extent(datas, d=>d.radius))
         .range([HIS_HEIGHT, 0]);
 
-    g.append("g")
-        .attr("class", "yAxis")
-        .call(d3.axisLeft(yScale));
+    if (!update_histo){
+        histo_yAxis = g.append("g")
+            .attr("class", "yAxis")
+            
+        histo_yAxis.call(d3.axisLeft(yScale));
 
-    g.append("g")
-        .attr("class", "xAxis")
-        .attr("transform", "translate(0," + HIS_HEIGHT + ")")
-        .call(xAxis)
-        .selectAll("text")
-        .attr("x", -35)
-        .attr("y", 0)
-        .attr("transform", "rotate(-80)");
+        histo_xAxis = g.append("g")
+            .attr("class", "xAxis")
+            .attr("transform", "translate(0," + HIS_HEIGHT + ")")
+            
+        histo_xAxis.call(xAxis)
+            .selectAll("text")
+            .attr("x", -35)
+            .attr("y", 0)
+            .attr("fill", "black")
+            .attr("transform", "rotate(-80)");
 
-    g.append("text")
-        .attr("x", HIS_WIDTH / 2)
-        .attr("y", HIS_HEIGHT + 70)
-        .attr("font-size", "12px")
-        .attr("text-anchor", "middle")
-        .text(type);
+        g.append("text")
+            .attr("x", HIS_WIDTH / 2)
+            .attr("y", HIS_HEIGHT + 70)
+            .attr("font-size", "12px")
+            .attr("text-anchor", "middle")
+            .text(type);
 
-    g.append("text")
-        .attr("x", - (HIS_HEIGHT / 2))
-        .attr("y", -40)
-        .attr("font-size", "12px")
-        .attr("text-anchor", "middle")
-        .attr("transform", "rotate(-90)")
-        .text("Count");
+        g.append("text")
+            .attr("x", - (HIS_HEIGHT / 2))
+            .attr("y", -40)
+            .attr("font-size", "12px")
+            .attr("text-anchor", "middle")
+            .attr("transform", "rotate(-90)")
+            .text("Count");
 
-    var rectG = g.append("g");
-    var rects = rectG.selectAll("rect")
-        .data(datas)
-        .enter()
-        .append("rect")
-        .attr("x", (d) => x(d.cluster))
-        .attr("y", (d) => yScale(d.radius))
-        .attr("width", x.bandwidth)
-        .attr("height", d => HIS_HEIGHT - yScale(d.radius))
-        .attr("fill", (d)=>brandColor(d.cluster))
-        .style("stroke", "black")
-        .style("stroke-width", 1);
+        rectG = g.append("g");
+        rects = rectG.selectAll("rect")
+            .data(datas)
+            .enter()
+            .append("rect")
+            .attr("x", (d) => x(d.cluster))
+            .attr("y", (d) => yScale(d.radius))
+            .attr("width", x.bandwidth)
+            .attr("height", d => HIS_HEIGHT - yScale(d.radius))
+            .attr("fill", (d)=>brandColor(d.cluster))
+            .style("stroke", "black")
+            .style("stroke-width", 1);
+    }
+    else{
+        rectG.selectAll("rect").data(datas).exit().remove();
+
+        var t = d3.transition()
+              .duration(1000);
+
+        var new_xAxis = d3.axisBottom(x)
+            .tickValues(datas.map((d) => d.cluster));
+
+        var new_yAxis = d3.axisLeft(yScale);
+
+        histo_xAxis.transition(t).call(new_xAxis);
+        histo_yAxis.transition(t).call(new_yAxis);
+
+        histo_xAxis.selectAll("text")
+                    .attr("x", -35)
+                    .attr("y", 0)
+                    .attr("fill", "black")
+                    .attr("transform", "rotate(-80)");
+
+        rectG.selectAll("rect").data(datas).enter().append("rect").transition(t)
+            .attr("x", (d) => x(d.cluster))
+            .attr("y", (d) => yScale(d.radius))
+            .attr("width", x.bandwidth)
+            .attr("height", d => HIS_HEIGHT - yScale(d.radius))
+            .attr("fill", (d)=>brandColor(d.cluster))
+            .style("stroke", "black")
+            .style("stroke-width", 1);
+
+        rects = rectG.selectAll("rect");
+
+        rects.data(datas).transition(t)
+            .attr("x", (d)=> x(d.cluster))
+            .attr("y", (d)=> yScale(d.radius))
+            .attr("width", x.bandwidth)
+            .attr("height", d => HIS_HEIGHT - yScale(d.radius))
+            .attr("fill", (d)=>brandColor(d.cluster))
+            .style("stroke", "black")
+            .style("stroke-width", 1);
+
+    }
+    update_histo = true;
 }
 
 function detDataBasedCatogory(datas) {
@@ -698,17 +747,21 @@ function detDataBasedCatogory(datas) {
 
 var drawChart = function(selected_tab, filterData)
 {
+    var datas = dataByPriceInterval(filterData, priceSlider1.value, priceSlider2.value);
     if (selected_tab == "brand")
     {
-        drawBubbleChart(dataByBrand(dataByPriceInterval(filterData, priceSlider1.value, priceSlider2.value)));
+        datas = dataByBrand(datas);
+        drawBubbleChart(datas);
     }
     else if (selected_tab == "cpu")
     {
-        drawBubbleChart(dataByCPU(dataByPriceInterval(filterData, priceSlider1.value, priceSlider2.value)));
+        datas = dataByCPU(datas);
+        drawBubbleChart(datas);
     }
     else if (selected_tab == "numeric")
     {
-        drawNumericBubbleChart(dataByPrice(dataByPriceInterval(filterData, priceSlider1.value, priceSlider2.value)));
+        datas = dataByPrice(datas);
+        drawNumericBubbleChart(datas);
     }
 }
 
@@ -799,7 +852,7 @@ var debounce = function(func, wait, immediate) {
 var drawCheckbox = function(brands) {
     var el = document.getElementById("checkbox-wrapper");
 
-    console.log(el)
+    // console.log(el)
 
     brands.forEach(function(d, i) {
         var elCheckbox = document.createElement('brand-checkbox');
