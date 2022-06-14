@@ -471,7 +471,7 @@ var drawNumericBubbleChart = function(datas)
     brand_list = [...new Set(brand_list)];
     // for (let i=0;i<=WIDTH;i+=WIDTH/brand_list.length) brand_location.push(i);
 
-    var xScale = d3.scaleBand()
+    var xS = d3.scaleBand()
         .domain(brand_list)
         .range([0,WIDTH]);
 
@@ -480,7 +480,7 @@ var drawNumericBubbleChart = function(datas)
     var xAxis = bubbleChart.append('g')
         .attr("class", "xAxis")
         .attr("transform", `translate(${0},${HEIGHT+MARGIN.top-MARGIN.bottom})`)
-        .call(d3.axisBottom().scale(xScale));
+        .call(d3.axisBottom().scale(xS));
 
     xAxis.selectAll("text")
         .attr("class", "tick")
@@ -500,7 +500,7 @@ var drawNumericBubbleChart = function(datas)
     }
     var rScale = d3.scaleLinear()
         .domain([0, max_num])
-        .range([20, 30])
+        .range([7, 15])
 
     var nodes = Array();
     for (let [key, value] of Object.entries(datas))
@@ -516,7 +516,7 @@ var drawNumericBubbleChart = function(datas)
     //     FORCE SIMULATION       //
     // ---------------------------//
     let min_price_rounded = Math.round(priceSlider1.value / price_step) * price_step;
-    let max_price_rounded = Math.round(priceSlider2.value / price_step) * price_step;
+    let max_price_rounded = Math.round(priceSlider2.value / price_step + 1) * price_step;
     let price_steps = [];
     for (let i=min_price_rounded;i<max_price_rounded;i+=price_step) price_steps.push(String(i));
     // let price_location = [];
@@ -525,11 +525,11 @@ var drawNumericBubbleChart = function(datas)
     // y force scale
     var yfScale = d3.scaleBand()
         .domain(price_steps)
-        .range([HEIGHT,0])
+        .range([HEIGHT+MARGIN.top-MARGIN.bottom,0])
 
     var simulation = d3.forceSimulation(nodes)
         .force('charge', d3.forceManyBody())
-        .force('xForce', d3.forceX(d=>xScale(d.brand)).strength(5))
+        .force('xForce', d3.forceX(d=>xS(d.brand)).strength(5))
         .force('yForce', d3.forceY(d=>yfScale(d.cluster)).strength(5))
     //   .force('collision', d3.forceCollide().radius(d=>rScale(d.radius)))
         .on('tick', ticked);   
@@ -583,29 +583,12 @@ var drawNumericBubbleChart = function(datas)
         tooltip.show(d);
     }
 
-    const labels = bubbleChart.selectAll('.label')
-               .data(nodes)
-               .enter()
-               .append('text')
-               .attr('x', d => d.x)
-               .attr('y', d => d.y)
-               .attr('dy', "0.4em")
-               .attr('text-anchor', 'middle')
-               .attr('fill', 'white')
-               .style('font-size',d => rScale(d.radius)-9+"px")
-               .text(d => d.cluster)
-               .on("mouseover", showTooltip_Label)
-               .on("mouseout", tooltip.hide);
-
     function ticked()
     {
         circles
-            .attr('cx', d => d.x)
+            .attr('cx', d => xS(d.brand))
             .attr('cy', d => d.y)
-
-        labels
-            .attr('x', d=>d.x)
-            .attr('y', d=>d.y)
+        
     }
 }
 
