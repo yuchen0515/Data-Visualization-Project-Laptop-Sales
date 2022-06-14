@@ -444,18 +444,25 @@ var drawNumericBubbleChart = function(datas)
     let brand_location = [];
     brand_list = brand_list.reduce( (arr, val)=>{return arr.concat(val)}, []);
     brand_list = [...new Set(brand_list)];
-    for (let i=0;i<=WIDTH;i+=WIDTH/brand_list.length) brand_location.push(i);
+    // for (let i=0;i<=WIDTH;i+=WIDTH/brand_list.length) brand_location.push(i);
 
-    var xScale = d3.scaleOrdinal()
+    var xScale = d3.scaleBand()
         .domain(brand_list)
-        .range(brand_location);
+        .range([0,WIDTH]);
 
     bubbleChart.selectAll(".xAxis").remove();
 
-    bubbleChart.append('g')
+    var xAxis = bubbleChart.append('g')
         .attr("class", "xAxis")
-        .attr("transform", `translate(${MARGIN.left},${HEIGHT-MARGIN.bottom})`)
+        .attr("transform", `translate(${0},${HEIGHT+MARGIN.top-MARGIN.bottom})`)
         .call(d3.axisBottom().scale(xScale));
+
+    xAxis.selectAll("text")
+        .attr("class", "tick")
+        .attr("x", -30)
+        .attr("y", 10)
+        .attr("fill", "black")
+        .attr("transform", "rotate(-45)");;
 
     // radius scale
     var max_num = 0;
@@ -486,34 +493,37 @@ var drawNumericBubbleChart = function(datas)
     let min_price_rounded = Math.round(priceSlider1.value / price_step) * price_step;
     let max_price_rounded = Math.round(priceSlider2.value / price_step) * price_step;
     let price_steps = [];
-    for (let i=min_price_rounded;i<max_price_rounded;i+=price_step) price_steps.push(i);
-    let price_location = [];
-    for (let i=HEIGHT;i>=0;i-=HEIGHT/price_steps.length) price_location.push(i);
+    for (let i=min_price_rounded;i<max_price_rounded;i+=price_step) price_steps.push(String(i));
+    // let price_location = [];
+    // for (let i=HEIGHT;i>=0;i-=HEIGHT/price_steps.length) price_location.push(i);
 
     // y force scale
-    var yfScale = d3.scaleThreshold()
+    var yfScale = d3.scaleBand()
         .domain(price_steps)
-        .range(price_location)
+        .range([HEIGHT,0])
 
     var simulation = d3.forceSimulation(nodes)
-        .force('charge', d3.forceManyBody().strength(2))
-        .force('xForce', d3.forceX(d=>xScale(d.brand)).strength(2))
-        .force('yForce', d3.forceY(d=>yfScale(parseInt(d.cluster))).strength(2))
+        .force('charge', d3.forceManyBody())
+        .force('xForce', d3.forceX(d=>xScale(d.brand)).strength(1))
+        .force('yForce', d3.forceY(d=>yfScale(d.cluster)).strength(1))
     //   .force('collision', d3.forceCollide().radius(d=>rScale(d.radius)))
         .on('tick', ticked);   
 
     bubbleChart.selectAll(".yAxis").remove();
 
-    bubbleChart.append('g')
+    var yAxis = bubbleChart.append('g')
         .attr("class", "yAxis")
-        .attr("transform", `translate(${MARGIN.left},${0})`)
-        .call(d3.axisLeft().scale(yfScale).ticks(20));
+        .attr("transform", `translate(${-20},${0})`)
+        .call(d3.axisLeft(yfScale));
+
+    yAxis.selectAll("text")
+        .attr("class", "tick");
 
     // ---------------------------//
     //           BUBBLES          //
     // ---------------------------//
     bubbleChart.selectAll("circle").remove();
-    bubbleChart.selectAll("text").remove();
+    bubbleChart.selectAll("text:not(.tick)").remove();
 
     var showTooltip_Circle = function(d) {
         // console.log(d)
