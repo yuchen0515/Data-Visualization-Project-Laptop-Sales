@@ -576,7 +576,7 @@ var drawNumericBubbleChart = function(datas)
 
 
 const HIS_LEFT = 0, HIS_TOP = 50;
-const HIS_TOTAL_WIDTH = 400, HIS_TOTAL_HEIGHT = 450;
+const HIS_TOTAL_WIDTH = 520, HIS_TOTAL_HEIGHT = 450;
 
 const HIS_MARGIN = {
     LEFT: 50,
