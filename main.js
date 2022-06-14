@@ -632,7 +632,7 @@ function drawHistogram(datas) {
         .tickValues(datas.map((d) => d.cluster));
 
     var yScale = d3.scaleLinear()
-        .domain(d3.extent(datas, d=>d.radius))
+        .domain([0,d3.extent(datas, d=>d.radius)[1]])
         .range([HIS_HEIGHT, 0]);
 
     if (!update_histo){
