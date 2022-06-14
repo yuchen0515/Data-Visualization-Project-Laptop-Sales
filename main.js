@@ -29,7 +29,7 @@ var dataset = d3.csv("Cleaned_Laptop_data.csv", function(d) {
 const MARGIN = {
     left: 100,
     right: 100,
-    top: 100,
+    top: -100,
     bottom: 100
 };
 
@@ -308,7 +308,7 @@ var drawBubbleChart = function(datas)
     // radius scale
     var rScale = d3.scaleLinear()
                    .domain([0, d3.max(d3.entries(datas), d => d.value.total)])
-                   .range([50, 70])
+                   .range([30, 120])
 
     var nodes = Array();
     var type = detDataBasedCatogory(datas);
@@ -395,7 +395,7 @@ var drawBubbleChart = function(datas)
         // height = d.data.model_count
         // console.log(height)
         tooltip
-            .offset([rScale(d.radius) + height * 10 + 50, 2.3 * rScale(d.radius)]);
+            .offset([rScale(d.radius) + height * 10 + 50, 1.5 * rScale(d.radius) + 70]);
         tooltip.show(d);
     }
 
@@ -415,7 +415,7 @@ var drawBubbleChart = function(datas)
 
     var showTooltip_Label = function(d) {
         tooltip
-            .offset([height * 10 + 65, 2.3 * rScale(d.radius)]);
+            .offset([height * 10 + 65, 1.5 * rScale(d.radius) + 70]);
 
         tooltip.show(d);
     }
@@ -446,7 +446,7 @@ var drawBubbleChart = function(datas)
                         return 'white'
                     }
                 } )
-                .style('font-size',d => rScale(d.radius)-35+"px")
+                .style('font-size',d => rScale(d.radius) / 2 - 5+"px")
                 .text(d => d.cluster)
                 .on("mouseover", showTooltip_Label)
                 .on("mouseout", tooltip.hide);
@@ -547,7 +547,7 @@ var drawNumericBubbleChart = function(datas)
         // console.log(rScale(d.radius) + height * 1.5 + 50 - d.y + 5000)
         tooltip
             // .offset([rScale(d.radius) + height * 1.5 + 50 - d.y + 5000, 2.3 * rScale(d.radius)]);
-            .offset([rScale(d.radius) + height * 1.5 + 50 , 2.3 * rScale(d.radius)]);
+            .offset([rScale(d.radius) + height * 1.5 + 50 , 1.5 * rScale(d.radius) + 70]);
 
         tooltip.show(d);
     }
@@ -568,7 +568,7 @@ var drawNumericBubbleChart = function(datas)
 
     var showTooltip_Label = function(d) {
         tooltip
-            .offset([height * 1.5 + 75, 2.3 * rScale(d.radius)]);
+            .offset([height * 1.5 + 75, 1.5 * rScale(d.radius) + 70]);
 
         tooltip.show(d);
     }
