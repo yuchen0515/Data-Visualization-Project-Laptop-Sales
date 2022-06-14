@@ -604,10 +604,10 @@ const HIS_LEFT = 0, HIS_TOP = 50;
 const HIS_TOTAL_WIDTH = 520, HIS_TOTAL_HEIGHT = 450;
 
 const HIS_MARGIN = {
-    LEFT: 50,
+    LEFT: 80,
     RIGHT: 10,
     TOP: 10,
-    BOTTOM: 70
+    BOTTOM: 85
 };
 
 const HIS_WIDTH = HIS_TOTAL_WIDTH - HIS_MARGIN.LEFT - HIS_MARGIN.RIGHT;
@@ -679,15 +679,15 @@ function drawHistogram(datas) {
 
         g.append("text")
             .attr("x", HIS_WIDTH / 2)
-            .attr("y", HIS_HEIGHT + 70)
-            .attr("font-size", "12px")
+            .attr("y", HIS_HEIGHT + 85)
+            .attr("font-size", "20px")
             .attr("text-anchor", "middle")
-            .text(type);
+            .text(type[0].toUpperCase() +  type.slice(1));
 
         g.append("text")
             .attr("x", - (HIS_HEIGHT / 2))
             .attr("y", -40)
-            .attr("font-size", "12px")
+            .attr("font-size", "20px")
             .attr("text-anchor", "middle")
             .attr("transform", "rotate(-90)")
             .text("Count");
