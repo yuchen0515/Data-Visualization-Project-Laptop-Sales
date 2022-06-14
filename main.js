@@ -471,9 +471,9 @@ var drawNumericBubbleChart = function(datas)
     brand_list = [...new Set(brand_list)];
     // for (let i=0;i<=WIDTH;i+=WIDTH/brand_list.length) brand_location.push(i);
 
-    var xS = d3.scaleBand()
+    var xS = d3.scalePoint()
         .domain(brand_list)
-        .range([0,WIDTH]);
+        .range([0, WIDTH]);
 
     bubbleChart.selectAll(".xAxis").remove();
 
@@ -560,6 +560,7 @@ var drawNumericBubbleChart = function(datas)
         .on('tick', ticked);   
 
     bubbleChart.selectAll(".yAxis").remove();
+    console.log(xS('ASUS'))
 
     var yAxis = bubbleChart.append('g')
         .attr("class", "yAxis")
