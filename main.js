@@ -163,13 +163,21 @@ var dataByPriceInterval = function(datas, min_price, max_price)
     return dataset_by_Price;
 }
 
+// var brandColor = d3.scale.category20b();
+var color = ['#e6194B', '#3cb44b', '#ffe119', '#4363d8', 
+             '#f58231', '#911eb4', '#42d4f4', '#f032e6',
+             '#bfef45', '#fabed4', '#469990', '#dcbeff',
+             '#9A6324', '#fffac8', '#800000', '#aaffc3',
+             '#808000', '#ffd8b1',
+             '#000075', '#a9a9a9', '#000000']
+// console.log(color)
 var brandColor = d3.scaleOrdinal()
     .domain(dataset.then(function(data) {
         var brands = data.map(function(d) {return d.brand});
         brands = [...new Set(brands)];
         return brands;
     }))
-    .range(d3.schemeAccent);
+    .range(color);
 
 // ---------------------------//
 //           TOOLTIP          //
@@ -411,6 +419,14 @@ var drawBubbleChart = function(datas)
 
         tooltip.show(d);
     }
+    function isBright(color) {
+        const hex = color.replace('#', '');
+        const c_r = parseInt(hex.substr(0, 2), 16);
+        const c_g = parseInt(hex.substr(2, 2), 16);
+        const c_b = parseInt(hex.substr(4, 2), 16);
+        const brightness = ((c_r * 299) + (c_g * 587) + (c_b * 114)) / 1000;
+        return brightness > 155;
+    }
 
     const labels = bubbleChart.selectAll('.label')
                 .data(nodes)
@@ -420,7 +436,16 @@ var drawBubbleChart = function(datas)
                 .attr('y', d => d.y)
                 .attr('dy', "0.4em")
                 .attr('text-anchor', 'middle')
-                .attr('fill', 'white')
+                // .attr('fill', 'white')
+                .attr("fill", function (d) {
+                    c = brandColor(d.cluster)
+                    if(isBright(c)){
+                        return 'black'
+                    }
+                    else{
+                        return 'white'
+                    }
+                } )
                 .style('font-size',d => rScale(d.radius)-35+"px")
                 .text(d => d.cluster)
                 .on("mouseover", showTooltip_Label)
