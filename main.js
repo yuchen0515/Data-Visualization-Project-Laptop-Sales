@@ -513,11 +513,20 @@ var drawNumericBubbleChart = function(datas)
     };
 
     var priceData = Object();
-    nodes.forEach(function(d) {
-        if (!(d.cluster in priceData)) {
-            priceData[d.cluster] = 0;
+    var cluster = "";
+    var ind = 0;
+    nodes.forEach(function(d, i) {
+        if (ind % 8 == 0) {
+            cluster = d.cluster
+            priceData[cluster] = 0;
+            ind += 1;
         }
-        priceData[d.cluster] += d.radius;
+
+        if (!(d.cluster in priceData)) {
+            ind += 1;
+        }
+
+        priceData[cluster] += d.radius;
     });
 
     var new_nodes = Array();
@@ -649,8 +658,7 @@ function drawHistogram(datas) {
             .paddingInner(0.1)
             .paddingOuter(0.2);
 
-        var xAxis = d3.axisBottom(x)
-            .tickValues(datas.map((d) => d.cluster));
+        var xAxis = d3.axisBottom(x).ticks(1);
 
         var yScale = d3.scaleLinear()
             .domain([0, d3.extent(datas, d=>d.radius)[1]])
@@ -664,7 +672,6 @@ function drawHistogram(datas) {
             .paddingOuter(0.2);
 
         var xAxis = d3.axisBottom(x)
-            .tickValues(datas.map((d) => d.cluster));
 
         var yScale = d3.scaleLinear()
             .domain([0,d3.extent(datas, d=>d.radius)[1]])
