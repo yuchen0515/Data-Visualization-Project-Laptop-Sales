@@ -409,7 +409,7 @@ var drawBubbleChart = function(datas)
                         .attr("fill", function (d) {
                             return brandColor(d.cluster);
                         } )
-                        .style("opacity", "0.6")
+                        .style("opacity", "0.8")
                         .on("mouseover", showTooltip_Circle)
                         .on("mouseout", tooltip.hide)
 
@@ -562,7 +562,7 @@ var drawNumericBubbleChart = function(datas)
                     .attr("fill", function (d) {
                         return priceColor(d);
                     } )
-                    .style("opacity", "0.6")
+                    .style("opacity", "0.8")
                     .on("mouseover", showTooltip_Circle)
                     .on("mouseout", tooltip.hide)
 
@@ -702,6 +702,7 @@ function drawHistogram(datas) {
             .attr("width", x.bandwidth)
             .attr("height", d => HIS_HEIGHT - yScale(d.radius))
             .attr("fill", (d)=>brandColor(d.cluster))
+            .style("opacity", "0.8")
             .style("stroke", "black")
             .style("stroke-width", 1);
     }
@@ -736,6 +737,7 @@ function drawHistogram(datas) {
             .attr("width", x.bandwidth)
             .attr("height", d => HIS_HEIGHT - yScale(d.radius))
             .attr("fill", (d)=>brandColor(d.cluster))
+            .style("opacity", "0.8")
             .style("stroke", "black")
             .style("stroke-width", 1);
 
@@ -747,6 +749,7 @@ function drawHistogram(datas) {
             .attr("width", x.bandwidth)
             .attr("height", d => HIS_HEIGHT - yScale(d.radius))
             .attr("fill", (d)=>brandColor(d.cluster))
+            .style("opacity", "0.8")
             .style("stroke", "black")
             .style("stroke-width", 1);
 
@@ -892,7 +895,7 @@ var drawCheckbox = function(brands) {
 
         var textBackgroundColor = '<span style="background-color:';
         textBackgroundColor += brandColor(d);
-        textBackgroundColor += ';">&emsp; &emsp; </span>';
+        textBackgroundColor += '; opacity: 0.8;">&emsp; &emsp; </span>';
 
         // str += '<div>'
         // str += '&#9;';
