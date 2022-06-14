@@ -512,6 +512,22 @@ var drawNumericBubbleChart = function(datas)
         }
     };
 
+    var priceData = Object();
+    nodes.forEach(function(d) {
+        if (!(d.cluster in priceData)) {
+            priceData[d.cluster] = 0;
+        }
+        priceData[d.cluster] += d.radius;
+    });
+
+    var new_nodes = Array();
+    for (let [key, value] of Object.entries(priceData)) {
+        let obj = {cluster: key, radius: value};
+        new_nodes.push(obj);
+    }
+
+    drawHistogram(new_nodes);
+
     // ---------------------------//
     //     FORCE SIMULATION       //
     // ---------------------------//
@@ -550,18 +566,6 @@ var drawNumericBubbleChart = function(datas)
     bubbleChart.selectAll("circle").remove();
     bubbleChart.selectAll("text:not(.tick)").remove();
 
-    var showTooltip_Circle = function(d) {
-        // console.log(d)
-        // console.log('!')
-        height = d.data.model_count
-        // console.log(rScale(d.radius) + height * 1.5 + 50 - d.y + 5000)
-        tooltip
-            // .offset([rScale(d.radius) + height * 1.5 + 50 - d.y + 5000, 2.3 * rScale(d.radius)]);
-            .offset([rScale(d.radius) + height * 1.5 + 50 , 1.5 * rScale(d.radius) + 70]);
-
-        tooltip.show(d);
-    }
-
     const circles = bubbleChart.selectAll('.node')
                     .data(nodes)
                     .enter()
@@ -573,15 +577,7 @@ var drawNumericBubbleChart = function(datas)
                         return priceColor(d);
                     } )
                     .style("opacity", "0.8")
-                    .on("mouseover", showTooltip_Circle)
-                    .on("mouseout", tooltip.hide)
 
-    var showTooltip_Label = function(d) {
-        tooltip
-            .offset([height * 1.5 + 75, 1.5 * rScale(d.radius) + 70]);
-
-        tooltip.show(d);
-    }
 
     function ticked()
     {
@@ -629,6 +625,11 @@ function drawHistogram(datas) {
 
     // Find datas type
     for (let [key, value] of Object.entries(datas)) {
+        if (Object.keys(value).indexOf('data') == -1) {
+            type = "price";
+            break;
+        }
+
         for (let [brand, el] of Object.entries(value.data.modelArray)) {
             if (typeof(el[1]) == "number") {
                 type = "brand";
@@ -640,18 +641,35 @@ function drawHistogram(datas) {
         break;
     }
 
-    var x = d3.scaleBand()
-        .domain(datas.map((d) => d.cluster))
-        .range([0, HIS_WIDTH])
-        .paddingInner(0.1)
-        .paddingOuter(0.2);
 
-    var xAxis = d3.axisBottom(x)
-        .tickValues(datas.map((d) => d.cluster));
+    if (type == "price") {
+        var x = d3.scaleBand()
+            .domain(datas.map((d) => d.cluster))
+            .range([0, HIS_WIDTH])
+            .paddingInner(0.1)
+            .paddingOuter(0.2);
 
-    var yScale = d3.scaleLinear()
-        .domain([0,d3.extent(datas, d=>d.radius)[1]])
-        .range([HIS_HEIGHT, 0]);
+        var xAxis = d3.axisBottom(x)
+            .tickValues(datas.map((d) => d.cluster));
+
+        var yScale = d3.scaleLinear()
+            .domain([0, d3.extent(datas, d=>d.radius)[1]])
+            .range([HIS_HEIGHT, 0]);
+
+    } else {
+        var x = d3.scaleBand()
+            .domain(datas.map((d) => d.cluster))
+            .range([0, HIS_WIDTH])
+            .paddingInner(0.1)
+            .paddingOuter(0.2);
+
+        var xAxis = d3.axisBottom(x)
+            .tickValues(datas.map((d) => d.cluster));
+
+        var yScale = d3.scaleLinear()
+            .domain([0,d3.extent(datas, d=>d.radius)[1]])
+            .range([HIS_HEIGHT, 0]);
+    }
 
     if (!update_histo){
         histo_yAxis = g.append("g")
@@ -686,18 +704,39 @@ function drawHistogram(datas) {
             .text("Count");
 
         rectG = g.append("g");
-        rects = rectG.selectAll("rect")
-            .data(datas)
-            .enter()
-            .append("rect")
-            .attr("x", (d) => x(d.cluster))
-            .attr("y", (d) => yScale(d.radius))
-            .attr("width", x.bandwidth)
-            .attr("height", d => HIS_HEIGHT - yScale(d.radius))
-            .attr("fill", (d)=>brandColor(d.cluster))
-            .style("opacity", "0.8")
-            .style("stroke", "black")
-            .style("stroke-width", 1);
+
+        if (type == "price") {
+            var colorScale = d3.scaleSequential()
+                .domain(d3.extent(datas, (d, i) => i))
+                .interpolator(d3.interpolateBuGn);
+
+            rects = rectG.selectAll("rect")
+                .data(datas)
+                .enter()
+                .append("rect")
+                .attr("x", (d) => x(d.cluster))
+                .attr("y", (d) => yScale(d.radius))
+                .attr("width", x.bandwidth)
+                .attr("height", d => HIS_HEIGHT - yScale(d.radius))
+                .attr("fill", (d, i)=>colorScale(i))
+                .style("opacity", "0.8")
+                .style("stroke", "black")
+                .style("stroke-width", 1);
+
+        } else {
+            rects = rectG.selectAll("rect")
+                .data(datas)
+                .enter()
+                .append("rect")
+                .attr("x", (d) => x(d.cluster))
+                .attr("y", (d) => yScale(d.radius))
+                .attr("width", x.bandwidth)
+                .attr("height", d => HIS_HEIGHT - yScale(d.radius))
+                .attr("fill", (d)=>brandColor(d.cluster))
+                .style("opacity", "0.8")
+                .style("stroke", "black")
+                .style("stroke-width", 1);
+        }
     }
     else{
         rectG.selectAll("rect").data(datas).exit().remove();
@@ -725,27 +764,55 @@ function drawHistogram(datas) {
                     .attr("fill", "black")
                     .attr("transform", "rotate(-80)");
 
-        rectG.selectAll("rect").data(datas).enter().append("rect").transition(t)
-            .attr("x", (d) => x(d.cluster))
-            .attr("y", (d) => yScale(d.radius))
-            .attr("width", x.bandwidth)
-            .attr("height", d => HIS_HEIGHT - yScale(d.radius))
-            .attr("fill", (d)=>brandColor(d.cluster))
-            .style("opacity", "0.8")
-            .style("stroke", "black")
-            .style("stroke-width", 1);
+        if (type == "price") {
+            var colorScale = d3.scaleSequential()
+                .domain(d3.extent(datas, (d, i) => i))
+                .interpolator(d3.interpolateBuGn);
 
-        rects = rectG.selectAll("rect");
+            rectG.selectAll("rect").data(datas).enter().append("rect").transition(t)
+                .attr("x", (d) => x(d.cluster))
+                .attr("y", (d) => yScale(d.radius))
+                .attr("width", x.bandwidth)
+                .attr("height", d => HIS_HEIGHT - yScale(d.radius))
+                .attr("fill", (d)=>colorScale(d.cluster))
+                .style("opacity", "0.8")
+                .style("stroke", "black")
+                .style("stroke-width", 1);
 
-        rects.data(datas).transition(t)
-            .attr("x", (d)=> x(d.cluster))
-            .attr("y", (d)=> yScale(d.radius))
-            .attr("width", x.bandwidth)
-            .attr("height", d => HIS_HEIGHT - yScale(d.radius))
-            .attr("fill", (d)=>brandColor(d.cluster))
-            .style("opacity", "0.8")
-            .style("stroke", "black")
-            .style("stroke-width", 1);
+            rects = rectG.selectAll("rect");
+
+            rects.data(datas).transition(t)
+                .attr("x", (d)=> x(d.cluster))
+                .attr("y", (d)=> yScale(d.radius))
+                .attr("width", x.bandwidth)
+                .attr("height", d => HIS_HEIGHT - yScale(d.radius))
+                .attr("fill", (d, i)=>colorScale(i))
+                .style("opacity", "0.8")
+                .style("stroke", "black")
+                .style("stroke-width", 1);
+        } else {
+            rectG.selectAll("rect").data(datas).enter().append("rect").transition(t)
+                .attr("x", (d) => x(d.cluster))
+                .attr("y", (d) => yScale(d.radius))
+                .attr("width", x.bandwidth)
+                .attr("height", d => HIS_HEIGHT - yScale(d.radius))
+                .attr("fill", (d)=>brandColor(d.cluster))
+                .style("opacity", "0.8")
+                .style("stroke", "black")
+                .style("stroke-width", 1);
+
+            rects = rectG.selectAll("rect");
+
+            rects.data(datas).transition(t)
+                .attr("x", (d)=> x(d.cluster))
+                .attr("y", (d)=> yScale(d.radius))
+                .attr("width", x.bandwidth)
+                .attr("height", d => HIS_HEIGHT - yScale(d.radius))
+                .attr("fill", (d)=>brandColor(d.cluster))
+                .style("opacity", "0.8")
+                .style("stroke", "black")
+                .style("stroke-width", 1);
+        }
 
     }
     update_histo = true;
