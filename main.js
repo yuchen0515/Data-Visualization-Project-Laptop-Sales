@@ -38,7 +38,7 @@ const WIDTH = 944 - MARGIN.left - MARGIN.right,
     padding = 1.5,      // seperation between same-color circles
     clusterpadding = 6. // seperation between different-color circles
 
-const price_step = 5000;
+const price_step = 20000;
 
 const svg = d3.select("#bubble-chart").append("svg")
             .attr("width", WIDTH + MARGIN.left + MARGIN.right)
@@ -504,8 +504,8 @@ var drawNumericBubbleChart = function(datas)
 
     var simulation = d3.forceSimulation(nodes)
         .force('charge', d3.forceManyBody())
-        .force('xForce', d3.forceX(d=>xScale(d.brand)).strength(1))
-        .force('yForce', d3.forceY(d=>yfScale(d.cluster)).strength(1))
+        .force('xForce', d3.forceX(d=>xScale(d.brand)).strength(5))
+        .force('yForce', d3.forceY(d=>yfScale(d.cluster)).strength(5))
     //   .force('collision', d3.forceCollide().radius(d=>rScale(d.radius)))
         .on('tick', ticked);   
 
